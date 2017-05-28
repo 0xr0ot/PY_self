@@ -1,2 +1,2 @@
-# py_self
-py_self
+# PY_self
+PY_self
