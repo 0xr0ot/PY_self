@@ -12,4 +12,6 @@ def sim_cos(prefs, p1, p2):
     
     sum1 = sum([pow(v, 2) for v in prefs[p1].values()])
     sum2 = sum([pow(v, 2) for v in prefs[p2].values()])
-    return sum_si/sqrt(sum1*sum2)
+    
+    r = sum_si/sqrt(sum1*sum2)
+    return r
