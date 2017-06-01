@@ -24,9 +24,7 @@ def sim_distance(prefs, p1, p2):
     return 1/(1+sqrt(sum_of_squares))
 
 
-
 def sim_pearson(prefs, p1, p2):
-    
     si = set(prefs[p1].keys()) & set(prefs[p2].keys()) ## shared items.
     n = len(si)
     if n == 0:
@@ -59,8 +57,7 @@ def sim_jaccard(prefs, p1, p2):
     sum_si = sum([(prefs[p1][it] * prefs[p1][it]) for it in si])
     
     sum1 = sum([pow(v, 2) for v in prefs[p1].values()])
-    sum2 = sum([pow(v, 2) for v in prefs[p2].values()])
-    
+    sum2 = sum([pow(v, 2) for v in prefs[p2].values()]) 
     return sum_si/(sum1+sum2-sum_si)
 
 
@@ -144,5 +141,3 @@ def get_recommend_items(prefs, item_match, user):
     ranks.sort()
     ranks.reverse()
     return ranks
-
-####END####
