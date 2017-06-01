@@ -1,4 +1,3 @@
-#!usr/bin/env python3
 #-*-coding: utf-8-*-
 
 def sim_jaccard(prefs, p1, p2):
@@ -10,4 +9,5 @@ def sim_jaccard(prefs, p1, p2):
     sum1 = sum([pow(v, 2) for v in prefs[p1].values()])
     sum2 = sum([pow(v, 2) for v in prefs[p2].values()])
     
-    return sum_si/(sum1+sum2-sum_si)
+    r = sum_si/(sum1+sum2-sum_si)
+    return r
