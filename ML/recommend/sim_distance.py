@@ -1,6 +1,8 @@
 #!usr/bin/env python3
 #-*-coding: utf-8-*-
 
+from math import sqrt
+
 
 def sim_distance(prefs, p1, p2):
     si = set(prefs[p1].keys()) & set(prefs[p2].keys()) ## shared items.
@@ -10,5 +12,3 @@ def sim_distance(prefs, p1, p2):
     
     sum_of_squares = sum(pow(prefs[p1][item]-prefs[p2][item], 2) for item in si)
     return 1/(1+sqrt(sum_of_squares))
-    
-####END####
