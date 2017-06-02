@@ -1,4 +1,5 @@
 #!usr/bin/env python3
+# -*-coding: utf-8-*-
 
 '''
 8.相差为2的两个质数称为孪生质数。例如3和5是一对孪生质数，41和43也是一对孪生质数。那么100～200之间共有多少对孪生质数呢？
@@ -15,5 +16,3 @@ def func(m, n):
         return ls0
     print('Error')
     return None
-        
-print(func(100, 200))
