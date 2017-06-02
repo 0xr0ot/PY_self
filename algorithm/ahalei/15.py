@@ -26,16 +26,16 @@ def has_zero(num):
             return True
 
 def main():
-	size = 0
-	for a in range(10, 100):
-		for b in range(100, 1000):
-			if is_same(a, b, 2, 3) is True or has_zero(a) is True or has_zero(b) is True:
-				continue
-			else:
-				for c in range(1000, 10000):
-					if is_same(a, c, 2, 4) is True or is_same(b, c, 3, 4) is True or has_zero(c) is True:
-						continue
-					elif a*b == c:
-						size += 1
-						print('{0}={1}*{2}...............size is {3}'.format(c, a, b, size))
-	return size
+    size = 0
+    for a in range(10, 100):
+        for b in range(100, 1000):
+            if is_same(a, b, 2, 3) is True or has_zero(a) is True or has_zero(b) is True:
+                continue
+            else:
+                for c in range(1000, 10000):
+                    if is_same(a, c, 2, 4) is True or is_same(b, c, 3, 4) is True or has_zero(c) is True:
+                        continue
+            elif a*b == c:
+                size += 1
+                print('{0}={1}*{2}...............size is {3}'.format(c, a, b, size))
+    return size
