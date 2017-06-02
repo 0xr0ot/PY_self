@@ -33,11 +33,11 @@ def main():
 	size = 0
 	for a in range(100, 1000):
 		for b in range(100, 1000):
-			if is_same(a, b, 3) is True or has_zero(a) is True or has_zero(b) is True:
+			if (is_same(a, b, 3) is True) or (has_zero(a) is True) or (has_zero(b) is True):
 				continue
 			else:
 				for c in range(100, 1000):
-					if is_same(a, c, 3) is True or is_same(b, c, 3) is True or has_zero(c) is True:
+					if (is_same(a, c, 3) is True) or (is_same(b, c, 3) is True) or (has_zero(c) is True):
 						continue
 					elif a+b == c:
 						size += 1
