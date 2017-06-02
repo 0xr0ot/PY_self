@@ -30,17 +30,17 @@ def has_zero(num):
         ##else <------Be careful!
 		
 def main():
-	size = 0
-	for a in range(100, 1000):
-		for b in range(100, 1000):
-			if (is_same(a, b, 3) is True) or (has_zero(a) is True) or (has_zero(b) is True):
-				continue
-			else:
-				for c in range(100, 1000):
-					if (is_same(a, c, 3) is True) or (is_same(b, c, 3) is True) or (has_zero(c) is True):
-						continue
-					elif a+b == c:
-						size += 1
-						print('{0}={1}+{2}...............size is {3}'.format(c, a, b, size))
-	r = size/2
-	return r
+    size = 0
+    for a in range(100, 1000):
+        for b in range(100, 1000):
+            if (is_same(a, b, 3) is True) or (has_zero(a) is True) or (has_zero(b) is True):
+                continue
+            else:
+                for c in range(100, 1000):
+                    if (is_same(a, c, 3) is True) or (is_same(b, c, 3) is True) or (has_zero(c) is True):
+                        continue
+                    elif a+b == c:
+                        size += 1
+                        print('{0}={1}+{2}...............size is {3}'.format(c, a, b, size))
+    r = size/2
+    return r
