@@ -1,4 +1,4 @@
-TK = str(576419.957554)
+TK = (576419.957554)
 ENG_TXT = '''what's your name?'''
 
 #QQ = quote(input(r'''Need translate EN to ZN:'''))
