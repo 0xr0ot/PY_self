@@ -12,7 +12,7 @@ from config import *
 def translate_gg(eng_txt):
     QQ = quote(eng_txt)
     url = ('https://translate.google.cn/translate_a/single?client=t&sl=en&tl=zh-CN&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md'+
-            '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&tk='+tk+'&q=' + QQ)
+            '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&tk='+str(TK)+'&q=' + QQ)
     headers = {'Accept': '*/*',
                'Accept-Language': 'zh-CN,zh;q=0.8',
                'accept-encoding': 'gzip, deflate, sdch, br',
@@ -29,5 +29,5 @@ def translate_gg(eng_txt):
     return js[0][0][0]
 
 if __name__ == '__main__':
-    result = translate_gg(eng_txt)
+    result = translate_gg(ENG_TXT)
     print(result)
