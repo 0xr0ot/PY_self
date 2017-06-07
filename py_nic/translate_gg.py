@@ -6,6 +6,7 @@ import json
 import requests
 from urllib.parse import quote
 from urllib.parse import urlencode
+from config import *
 
 
 def translate_gg(eng_txt):
