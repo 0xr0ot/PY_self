@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Jun 25 00:51:51 2017
-
 @author: Ulion_Tse
 """
-
 import requests
 import json
 
@@ -17,8 +15,7 @@ def main(url):
         'Referer': 'http://find.qq.com/index.html?version=1&im_version=5497&width=910&height=610&search_target=0',
         'Accept-Encoding': 'gzip,deflate',
         'Accept-Language': 'en-us,en'    
-        }
-    
+        }    
     res = requests.get(url, headers=headers)
     html = res.text
     html = html[12:-3]+'}'
