@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Jun 24 20:31:15 2017
-
 @author: Ulion_Tse
 """
-
 import requests
 import json
 import re
-
 
 def get_json(url):
     headers = {
@@ -24,7 +21,6 @@ def get_json(url):
     html = res.text
     noqt_json = html[11:-2]
     return noqt_json
-    
 
 def trans_noq(noq_json):
     '''Expecting property name enclosed in double quotes.'''
@@ -40,13 +36,11 @@ def trans_noq(noq_json):
     noq_json = '{"1":' + noq_json[3:]
     return noq_json
     
-    
 def main(url):
     nq_json = get_json(url)
     trans_json = trans_noq(nq_json)
     data = json.loads(trans_json)
     return data
-    
 
 if __name__ == '__main__':
     url = 'http://s.url.cn/qqfind/js/location4.js'
