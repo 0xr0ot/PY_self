@@ -1,9 +1,29 @@
-import pymysql
+import pymysql.cursors
 
-def connDB(data):
-    conn = pymysql.connect(host='localhost',user='root',passwd='#######',db='xxxx',)
-    cur = conn.cursor() ##游标
-    cur.execute('create database if not exists test;')
-    cur.close() ##关游标
-    conn.commit()
-    conn.close() ##关数据库
+# Connect to the database
+connection = pymysql.connect(host='localhost',
+                             port='3306',
+                             user='user',
+                             password='passwd',
+                             db='db',
+                             charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
+
+try:
+    with connection.cursor() as cursor:
+        # Create a new record
+        sql = "INSERT INTO `users` (`email`, `password`) VALUES (%s, %s)"
+        cursor.execute(sql, ('webmaster@python.org', 'very-secret'))
+
+    # connection is not autocommit by default. So you must commit to save
+    # your changes.
+    connection.commit()
+
+    with connection.cursor() as cursor:
+        # Read a single record
+        sql = "SELECT `id`, `password` FROM `users` WHERE `email`=%s"
+        cursor.execute(sql, ('webmaster@python.org',))
+        result = cursor.fetchone()
+        print(result)
+finally:
+    connection.close()
