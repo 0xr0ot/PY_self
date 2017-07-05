@@ -13,3 +13,9 @@ if __name__ == '__main__':
 
 ##method_2:
 time_stamp = int(time.time())
+
+##opposite：
+timeStamp = 1499245099
+def trans_timestamp(tsp):
+    see_time = datetime.datetime.utcfromtimestamp(tsp).strftime("%Y-%m-%d %H:%M:%S")## utc: 8 hours.
+    return see_time
