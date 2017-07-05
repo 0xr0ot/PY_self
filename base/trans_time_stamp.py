@@ -8,9 +8,6 @@ def get_timestamp():
     time_stamp = int(time.mktime(time_p))
     return time_stamp
 
-if __name__ == '__main__':
-    get_timestamp()
-
 ##method_2:
 time_stamp = int(time.time())
 
