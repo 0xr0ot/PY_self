@@ -17,5 +17,6 @@ time_stamp = int(time.time())
 ##opposite：
 timeStamp = 1499245099
 def trans_timestamp(tsp):
-    see_time = datetime.datetime.utcfromtimestamp(tsp).strftime("%Y-%m-%d %H:%M:%S")## utc: 8 hours.
+    ##datetime.datetime.utcfromtimestamp(tsp)## utc: +8 hours.in China not need.
+    see_time = datetime.datetime.fromtimestamp(tsp).strftime("%Y-%m-%d %H:%M:%S")
     return see_time
