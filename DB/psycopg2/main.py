@@ -20,6 +20,6 @@ if __name__ == '__main__':
     conn = psycopg2.connect(database="db", user="ulion", password="xxxx", host="xxx.xx.xxx.xxx", port="5432")
     cur = conn.cursor()
     cur.execute("CREATE TABLE ulion.feedslist (feeds_id varchar PRIMARY KEY,view_times integer,deadline timestamp);")
-    print(main(30))
+    main()##TODO
     cur.close()
     conn.close()
