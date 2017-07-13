@@ -9,7 +9,7 @@ def get_timestamp():
     return time_stamp
 
 ##method_2:
-time_stamp = int(time.time())
+time_stamp = int(1000 * time.time())
 
 ##opposite：
 timeStamp = 1499245099
