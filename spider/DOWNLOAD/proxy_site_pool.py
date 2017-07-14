@@ -1,0 +1,21 @@
+proxy_site_pool = [
+    'http://www.xicidaili.com/',
+    'http://www.proxy360.cn/default.aspx',
+    'http://proxy.mimvp.com/free.php',
+    'http://ip.zdaye.com/',
+    'http://www.kuaidaili.com/free/',
+    'http://www.66ip.cn/',
+    'http://www.nianshao.me/',
+    'http://www.ip181.com/',
+    'http://www.goubanjia.com/',
+    'http://www.yun-daili.com/',
+    'http://www.ip3366.net/free/',
+    'http://www.httpdaili.com/mfdl/',
+    'http://www.mayidaili.com/free',
+    'http://www.xdaili.cn/freeproxy.html',
+    'http://www.httpsdaili.com/',
+    'http://www.iphai.com/',
+    'http://www.bugng.com/',
+    'http://www.fengyunip.com/free/index.html',
+    'http://ip.qiaodm.com/free/index.html'
+    ]
