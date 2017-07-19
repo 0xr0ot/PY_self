@@ -21,10 +21,10 @@ print(score)## More greater more good.
 #####################################################################################################################
 
 ## KMeans.
-from sklearn.cluster import MiniBatchKMeans
+from sklearn.cluster import KMeans
 for index, k in enumerate((2,3,4,5,6,7,)):
     plt.subplot(2,3,index+1)
-    y_pred = MiniBatchKMeans(n_clusters=k, random_state=9).fit_predict(X)
+    y_pred = KMeans(n_clusters=k, random_state=9).fit_predict(X)
     score= metrics.calinski_harabaz_score(X, y_pred)  
     plt.scatter(X[:, 0], X[:, 1], c=y_pred)
     plt.text(.99, .01, ('k=%d, score: %.2f' % (k,score)),
