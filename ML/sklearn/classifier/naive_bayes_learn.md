@@ -6,9 +6,9 @@
 
 ## *1.认识[贝叶斯](https://en.wikipedia.org/wiki/Bayesian)*：
 - ##### 历史
-贝叶斯学派很古老，但是从诞生到一百年前一直不是主流。主流是频率学派。频率学派的权威皮尔逊和费歇尔都对贝叶斯学派不屑一顾，但是贝叶斯学派硬是凭借在现代特定领域的出色应用表现为自己赢得了半壁江山。被频率学派攻击的主要是先验概率，一般来说先验概率就是我们对于数据所在领域的历史经验，但是这个经验常常难以量化或者模型化，于是贝叶斯学派大胆的假设先验分布的模型，比如[正态分布]((https://en.wikipedia.org/wiki/Normal_distribution))，[beta分布](https://en.wikipedia.org/wiki/Beta_distribution)等。这个假设一般没有特定的依据，因此一直被频率学派认为很荒谬。[<<<更多](https://www.zhihu.com/question/20587681)
+贝叶斯学派很古老，但是从诞生到一百年前一直不是主流。主流是频率学派。频率学派的权威皮尔逊和费歇尔都对贝叶斯学派不屑一顾，但是贝叶斯学派硬是凭借在现代特定领域的出色应用表现为自己赢得了半壁江山。被频率学派攻击的主要是先验概率，一般来说先验概率就是我们对于数据所在领域的历史经验，但是这个经验常常难以量化或者模型化，于是贝叶斯学派大胆的假设先验分布的模型，比如[正态分布](https://en.wikipedia.org/wiki/Normal_distribution)，[beta分布](https://en.wikipedia.org/wiki/Beta_distribution)等。这个假设一般没有特定的依据，因此一直被频率学派认为很荒谬。[<<<更多](https://www.zhihu.com/question/20587681)
 - ##### 思想
-贝叶斯学派的思想可以概括为[先验概率](https://en.wikipedia.org/wiki/Prior_probability)+数据=[后验概率](https://en.wikipedia.org/wiki/Posterior_probability)。也就是说我们在实际问题中需要得到的[后验概率](https://en.wikipedia.org/wiki/Posterior_probability)，可以通过[先验概率](https://en.wikipedia.org/wiki/Prior_probability)和数据一起综合得到。
+贝叶斯学派的思想可以概括为[先验概率](https://en.wikipedia.org/wiki/Prior_probability)+数据->[后验概率](https://en.wikipedia.org/wiki/Posterior_probability)。也就是说我们在实际问题中需要得到的[后验概率](https://en.wikipedia.org/wiki/Posterior_probability)，可以通过[先验概率](https://en.wikipedia.org/wiki/Prior_probability)和数据一起综合得到。
 - ##### 应用
 比如`垃圾邮件分类`，`文本分类`。
 - ##### 过程
