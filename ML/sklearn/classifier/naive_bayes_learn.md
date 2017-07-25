@@ -32,7 +32,7 @@
 | 先验为[伯努利分布](https://en.wikipedia.org/wiki/Bernoulli_distribution)的朴素贝叶斯 | 样本特征的分布大部分是`二元离散值`或者很稀疏的`多元离散值` | `BernoulliNB(alpha=1.0,fit_prior=True,class_prior=None,binarize=0.0)` |
 
 
-- *Talk is chep, show me code:*
+- *Example:*
 ```python
 import numpy as np
 from sklearn.naive_bayes import GaussianNB,MultinomialNB,BaseDiscreteNB,BernoulliNB
