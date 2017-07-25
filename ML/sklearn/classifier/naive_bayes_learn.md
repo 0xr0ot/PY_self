@@ -1,6 +1,6 @@
 # *Welcome to [Naive Bayes classifier](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) !*
 | Team|[qxiu_BI](http://bi.qxiu.com/)|
-| ---  | ---  |
+| :---:  | :---:  |
 | Author | ulion.tse|
 | Date | 2017-07-25 |
 
