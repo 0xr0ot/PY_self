@@ -84,11 +84,16 @@ iris_model <- ctree(Species ~ ., data = train_data)#条件推断树
 
 #调参（model中）
 #control = tree.control(nobs, mincut = 5, minsize = 10, mindev = 0.01)
-#control = ctree_control(teststat = c("quad", "max"), 
-#              testtype = c("Bonferroni", "MonteCarlo", "Univariate", "Teststatistic"), 
-#              mincriterion = 0.95, minsplit = 20, minbucket = 7, 
-#              stump = FALSE, nresample = 9999, maxsurrogate = 0, 
-#              mtry = 0, savesplitstats = TRUE, maxdepth = 0, remove_weights = FALSE)
+#control = ctree_control(teststat = c("quad", "max"),
+#                        testtype = c("Bonferroni", "MonteCarlo", "Univariate", "Teststatistic"),
+#                        mincriterion = 0.95, minsplit = 20, minbucket = 7,
+#                        stump = FALSE, nresample = 9999, maxsurrogate = 0,
+#                        mtry = 0, savesplitstats = TRUE, maxdepth = 0, remove_weights = FALSE)
+#control = Weka_control(R = TRUE, M = 5, ...)
+#control = rpart.control(minsplit = 20, minbucket = round(minsplit/3), cp = 0.01, 
+#                        maxcompete = 4, maxsurrogate = 5, usesurrogate = 2, xval = 10,
+#                        surrogatestyle = 0, maxdepth = 30, ...)
+
 
 #预测
 pred <- predict(iris_model, newdata = test_data)
