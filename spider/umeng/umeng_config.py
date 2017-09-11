@@ -32,5 +32,5 @@ headers_get_csrf = {
     'Accept-Language': 'zh-CN,zh;q=0.8'
 }
 
-cookie_app = ''
-cookie_channel = ''
+cookie_app = ''#DIY
+cookie_channel = ''#DIY
