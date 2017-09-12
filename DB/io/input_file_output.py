@@ -19,7 +19,7 @@ def read_bigfile(path):
         while mark:
             content.append((f.readline())[:-1]) ##del '\n'
             mark = content[-1]
-    return content[:-1]
+    return content[:-1]##list
 
 
 def read_smallfile(path):
@@ -38,7 +38,7 @@ def write_file(path):
 np_data = np.genfromtxt(path_0, skip_header=1, dtype=None, delimiter=',')
 print(np_data[0][0].decode('utf-8'))
 
-pd_data = pd.read_csv(path_0, header=0, sep=',', encoding='utf-8')
+pd_data = pd.read_csv(path_0, header=0, sep=',', encoding='utf-8')##header=None
 #read_table
 pd_data.to_csv('test0_to_csv.xlsx', sep='\t', index=False, encoding='utf-8')
 
