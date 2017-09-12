@@ -15,7 +15,7 @@ def get_data(url,anchor_id):
         'Cache-Control': 'max-age=0',
         'Accept': '*/*',
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
-        'Referer': 'http://live.mi.com/lang/cn/index.html?zuid=4269660&lid=4269660_1504861488',#TODO
+        'Referer': 'http://live.mi.com/lang/cn/index.html?zuid=4269660&lid=4269660_{0}'.format(int(time.time())-10000),#TODO
         'Accept-Encoding': 'gzip, deflate, sdch',
         'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.6'
     }
