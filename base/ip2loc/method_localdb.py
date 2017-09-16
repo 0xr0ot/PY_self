@@ -1,5 +1,6 @@
 ###########################################  纯真ip  ######################################
 
+#https://github.com/animalize/qqwry-python3
 #https://github.com/gwind/ylinux/tree/master/tools/IP/QQWry
 #https://segmentfault.com/a/1190000000352578
 
