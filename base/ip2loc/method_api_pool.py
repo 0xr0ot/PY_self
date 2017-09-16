@@ -1,0 +1,4 @@
+api_pool = ['http://ip.taobao.com/service/getIpInfo.php?ip=xxx.xxx.xx.xx',
+            'http://api.chenjiehua.me/ip/xxx.xxx.xx.xx',
+            'http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip=xxx.xxx.xx.xx',
+            '']
