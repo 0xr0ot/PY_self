@@ -20,6 +20,5 @@ def get_address(ip):
     res = requests.get(host+ip)
     return res.json()
 
-
 >>>print(get_address('115.55.1.36'))
 {'ip': '115.55.1.36', 'country_code': 'CN', 'country_name': 'China', 'region_code': '41', 'region_name': 'Henan', 'city': 'Zhengzhou', 'zip_code': '', 'time_zone': 'Asia/Shanghai', 'latitude': 34.6836, 'longitude': 113.5325, 'metro_code': 0}
