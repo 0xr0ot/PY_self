@@ -34,7 +34,7 @@ def main(i):
     L = []
     path = r'F:\ip\{0}_ip.csv'.format(i)
     for ind,dt in enumerate(gen_data(path)):
-        if len(L) > 200000: #性能最优解
+        if len(L) > 200000: #性能最优解,一分钟可插入30万条数据
             print('Saving {0} rows data...'.format(len(L)))
             save_data(L)
             L = []
