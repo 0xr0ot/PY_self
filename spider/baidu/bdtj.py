@@ -24,7 +24,8 @@ class Baidu(object):
                          "method": method, 
                          "start_date": start_date,
                          "end_date": end_date, 
-                         "metrics": metrics}}
+                         "metrics": metrics}
+        }
         for key in kw:
             body['body'][key] = kw[key]
         data = bytes(json.dumps(body), 'utf8')
