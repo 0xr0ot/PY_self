@@ -8,13 +8,11 @@ from pprint import pprint as ppt
 
 
 class Baidu(object):
-
     def __init__(self, siteId, username, password, token):
         self.siteId = siteId
         self.username = username
         self.password = password
         self.token = token
-
 
     def getresult(self, start_date, end_date, method, metrics, **kw):
         base_url = "https://api.baidu.com/json/tongji/v1/ReportService/getData"
@@ -33,7 +31,6 @@ class Baidu(object):
         res = requests.post(base_url, data)
         return res.text
 
-
     def save_data(self,dt):
         sql = ("INSERT INTO tb_xxx "
                "(site_name,site,siteid,PV,UV,IP_count,bounce_ratio,avg_visit_time,deadline)"
@@ -47,15 +44,12 @@ class Baidu(object):
 
 if __name__ == '__main__':
     base_url = "https://api.baidu.com/json/tongji/v1/ReportService/getData"
-
     today = datetime.date.today()
     yesterday = today - datetime.timedelta(days=1)#TODO
     yest,td = str(yesterday).replace("-", ""),str(today).replace("-", "")
-
     siteid = {
         xxx: ['xx.xxx.com','xxWEBxx']
     }
-
     conn = pymysql.connect(host='xxx.xx.xx.xx',
                                  port=33066,
                                  user='xxx_user',
@@ -69,7 +63,6 @@ if __name__ == '__main__':
         "(site_name varchar(10),site varchar(15),siteid int,PV int,UV int,IP_count int,"
         "bounce_ratio float,avg_visit_time int,deadline timestamp);"
     )
-
     for sid in siteid.keys():
         bd = Baidu(sid, "USERNAME", "PASSWORD", "TOKEN")#TODO
         result = bd.getresult(yest, td, "overview/getTimeTrendRpt", "pv_count,visitor_count,ip_count,bounce_ratio,avg_visit_time")
