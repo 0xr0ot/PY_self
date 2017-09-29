@@ -19,7 +19,6 @@ def caesar_cipher(msg,key=0):
         if symbol in LETTERS:
             num = LETTERS.find(symbol)#index()
             num += key
-  
             if num >= len(LETTERS):
                 num -= len(LETTERS)
             elif num < 0:
