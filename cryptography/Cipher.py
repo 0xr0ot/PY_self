@@ -4,8 +4,7 @@ LETTERS = r'''!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`a 
 
 # 1 反转加密
 def reverse_cipher(msg):
-    translated = ''
-    
+    translated = '' 
     i = len(msg) - 1
     while i > 0:
         translated += msg[i]
@@ -16,7 +15,6 @@ def reverse_cipher(msg):
 # 2 凯撒加密
 def caesar_cipher(msg,key=0):
     translated = ''
-    
     for symbol in msg:
         if symbol in LETTERS:
             num = LETTERS.find(symbol)#index()
@@ -35,3 +33,4 @@ def caesar_cipher(msg,key=0):
 # 3 换位加密
 def transposition_cipher(msg):
     pass
+#TODO
