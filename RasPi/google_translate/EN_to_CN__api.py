@@ -87,9 +87,8 @@ class google():
 
     def translate(self,eng_txt,TK):
         QQ = quote(eng_txt)
-        url = (
-        'https://translate.google.cn/translate_a/single?client=t&sl=en&tl=zh-CN&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md' +
-        '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&tk=' + str(TK) + '&q=' + QQ)
+        url = ('https://translate.google.cn/translate_a/single?client=t&sl=en&tl=zh-CN&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md' +
+               '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&tk=' + str(TK) + '&q=' + QQ)
         headers = {'Accept': '*/*',
                    'Accept-Language': 'zh-CN,zh;q=0.8',
                    'accept-encoding': 'gzip, deflate, sdch, br',
@@ -97,7 +96,7 @@ class google():
                    'dnt': '1',
                    'referer': 'https://translate.google.cn/',
                    'x-client-data': 'CJK2yQEIprbJAQjEtskBCPqcygEIqZ3KAQ=='
-                   }
+               }
         session = requests.Session()
         res = session.get(url, headers=headers)
         data = res.json()
