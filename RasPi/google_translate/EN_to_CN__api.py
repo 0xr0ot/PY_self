@@ -1,6 +1,5 @@
 #coding:utf-8
-##TKK=eval('((function(){var a\x3d4213696134;var b\x3d-683150102;return 418522+\x27.\x27+(a+b)})())');
-##TKK=eval('((function(){var a\x3d1332910131;var b\x3d1651328963;return 418538+\x27.\x27+(a+b)})())');
+
 import re
 import requests
 from urllib.parse import quote
@@ -80,15 +79,24 @@ class google():
         a ^= int(d[1]) if len(d) > 1 else 0
         if a < 0:  # pragma: nocover
             a = (a & 2147483647) + 2147483648
-        a %= 1000000  # int(1E6)
 
+        a %= 1000000  # int(1E6)
         return '{}.{}'.format(a, a ^ b)
 
 
-    def translate(self,eng_txt,TK):
+    def translate(self,eng_txt,TK,aim='EN_to_CN'):
         QQ = quote(eng_txt)
-        url = ('https://translate.google.cn/translate_a/single?client=t&sl=en&tl=zh-CN&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md' +
-               '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&tk=' + str(TK) + '&q=' + QQ)
+        if aim == 'EN_to_CN':
+            url = ('https://translate.google.cn/translate_a/single?client=t&sl=en&tl=zh-CN&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md'
+                  + '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&tk=' + str(TK) + '&q=' + QQ)
+        elif aim == 'CN_to_EN':
+            ruler = '&sl=zh-CN&tl=en'
+            url = ('https://translate.google.cn/translate_a/single?client=t'+ruler+'&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md'
+                  + '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&tk=' + str(TK) + '&q=' + QQ)
+        else:
+            print('作者(UlionTse): 出错了吧，只提供英汉翻译! 翻译模式"aim"只有"EN_to_CN" or "CN_to_EN"两种,如果有必要，请自行添加和修改代码。')
+            url = ''
+
         headers = {'Accept': '*/*',
                    'Accept-Language': 'zh-CN,zh;q=0.8',
                    'accept-encoding': 'gzip, deflate, sdch, br',
@@ -96,7 +104,7 @@ class google():
                    'dnt': '1',
                    'referer': 'https://translate.google.cn/',
                    'x-client-data': 'CJK2yQEIprbJAQjEtskBCPqcygEIqZ3KAQ=='
-               }
+            }
         session = requests.Session()
         res = session.get(url, headers=headers)
         data = res.json()
@@ -104,14 +112,18 @@ class google():
         return data[0][0][0]
 
 
-def main(text):
+def main(text,aim='EN_to_CN'):
     api = google()
     tkk = api.get_tkk()
     TK = api.acquire(text,tkk)
-    result = api.translate(text,TK)
+    result = api.translate(text,TK,aim=aim)
     print(result)
 
+
 if __name__ == '__main__':
-    #text = input(r'''Need translate EN to ZN: ''')
-    text = 'Hello, pikaqiu, I miss you very much, am xiaozhi, do you remember me?'#注意：句号，叹号，问号之后不再翻译！！！
-    main(text)
+    #text = input(r'''Need translate EN_to_CN: ''')
+    text1 = 'Hello, pikaqiu, I miss you very much, am xiaozhi, do you remember me?'
+    text2 = '注意：句号，叹号，问号之后不再翻译！'
+    main(text1)
+    main(text2,aim="CN_to_E")#please repair the "aim".
+#END
