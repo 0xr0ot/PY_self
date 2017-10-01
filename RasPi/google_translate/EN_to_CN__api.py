@@ -123,4 +123,4 @@ if __name__ == '__main__':
     text1 = r'''Hello, I'm UlionTse. Today I repaired the question which translate first sentence only.'''
     text2 = r'''2017年10月1日完善了代码。哈哈，你知道1+2=？'''
     main(text1)
-    main(text2,aim="CN_to_EN")#please repair the "aim".
+    main(text2,aim="CN_to_E")#please repair the "aim".
