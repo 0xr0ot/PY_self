@@ -95,14 +95,7 @@ class google():
             print('作者(UlionTse): 出错了吧，只提供英汉翻译! 翻译模式"aim"只有"EN_to_CN" or "CN_to_EN"两种,如果有必要，请自行添加和修改代码。')
             url = ''
 
-        headers = {'Accept': '*/*',
-                   'Accept-Language': 'zh-CN,zh;q=0.8',
-                   'accept-encoding': 'gzip, deflate, sdch, br',
-                   'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36',
-                   'dnt': '1',
-                   'referer': 'https://translate.google.cn/',
-                   'x-client-data': 'CJK2yQEIprbJAQjEtskBCPqcygEIqZ3KAQ=='
-            }
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:55.0) Gecko/20100101 Firefox/55.0'}
         session = requests.Session()
         try:
             res = session.get(url, headers=headers)
@@ -131,4 +124,3 @@ if __name__ == '__main__':
     text2 = '2017年10月1日完善了代码。哈哈，你知道1+2=？'
     main(text1)
     main(text2,aim="CN_to_E")#please repair the "aim".
-#END
