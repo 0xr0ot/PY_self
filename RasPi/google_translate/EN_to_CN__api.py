@@ -26,7 +26,7 @@ class google():
     #     return (val % 0x100000000) >> n
 
 
-    def _xr(self, a, b):
+    def _xr(self, a, b):#引用, thanks "ssut".
         size_b = len(b)
         c = 0
         while c < size_b - 2:
@@ -35,7 +35,6 @@ class google():
             #d = google.rshift(self,a, d) if '+' == b[c + 1] else a << d
             d = (a % 0x100000000) >> d if '+' == b[c + 1] else a << d
             a = a + d & 4294967295 if '+' == b[c] else a ^ d
-
             c += 3
         return a
 
@@ -79,7 +78,6 @@ class google():
         a ^= int(d[1]) if len(d) > 1 else 0
         if a < 0:  # pragma: nocover
             a = (a & 2147483647) + 2147483648
-
         a %= 1000000  # int(1E6)
         return '{}.{}'.format(a, a ^ b)
 
@@ -106,14 +104,16 @@ class google():
                    'x-client-data': 'CJK2yQEIprbJAQjEtskBCPqcygEIqZ3KAQ=='
             }
         session = requests.Session()
-        res = session.get(url, headers=headers)
-        data = res.json()
-        
-        result = ''
-        for dt in data[0]:
-            if dt[0]:
-                result += dt[0]
-        session.close()
+        try:
+            res = session.get(url, headers=headers)
+            data = res.json()
+            
+            result = ''
+            for dt in data[0]:
+                if dt[0]:
+                    result += dt[0]
+        finally:
+            session.close()
         return result
 
 
