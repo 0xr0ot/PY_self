@@ -26,7 +26,7 @@ class google():
     #     return (val % 0x100000000) >> n
 
 
-    def _xr(self, a, b):#引用
+    def _xr(self, a, b):
         size_b = len(b)
         c = 0
         while c < size_b - 2:
@@ -40,7 +40,7 @@ class google():
         return a
 
 
-    def acquire(self, text, tkk):#引用
+    def acquire(self, text, tkk):#引用, thanks "ssut".
         #tkk = google.get_tkk(self)
         b = tkk if tkk != '0' else ''
         d = b.split('.')
@@ -108,8 +108,13 @@ class google():
         session = requests.Session()
         res = session.get(url, headers=headers)
         data = res.json()
+        
+        result = ''
+        for dt in data[0]:
+            if dt[0]:
+                result += dt[0]
         session.close()
-        return data[0][0][0]
+        return result
 
 
 def main(text,aim='EN_to_CN'):
@@ -122,8 +127,8 @@ def main(text,aim='EN_to_CN'):
 
 if __name__ == '__main__':
     #text = input(r'''Need translate EN_to_CN: ''')
-    text1 = 'Hello, pikaqiu, I miss you very much, am xiaozhi, do you remember me?'
-    text2 = '注意：句号，叹号，问号之后不再翻译！'
+    text1 = 'Hello, I\'m UlionTse. Today I repaired the question which translate first sentence only.'
+    text2 = '2017年10月1日完善了代码。哈哈，你知道1+2=？'
     main(text1)
     main(text2,aim="CN_to_E")#please repair the "aim".
 #END
