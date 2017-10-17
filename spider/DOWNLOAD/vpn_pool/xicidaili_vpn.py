@@ -67,7 +67,7 @@ def get_data(soup):
 
 def save_psg(dt):
     try:
-        sql = ("INSERT INTO xxx.ip_pool_xxx"
+        sql = ("INSERT INTO db_xxx.xxx__vpn_pool "
                "(complete_ip,ip_address,port,country,server_area,category,http_type,transfer_speed,response_time,"
                "network_operator,survived_time,verify_datetime,source_url,source_host)"
                "VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}');".format(
@@ -83,8 +83,8 @@ def save_psg(dt):
 def main(number):
     id_pool = set()
     for cat in category:
-        for num in range(3,number):
-            url = host + '/{0}/{1}'.format(cat,number)
+        for num in range(1,number): #no page_0.
+            url = host + '/{0}/{1}'.format(cat,num)
             time.sleep(6)
             soup = get_soup(url)
             #print(soup)
@@ -101,6 +101,12 @@ def main(number):
 if __name__ == '__main__':
     conn = psycopg2.connect(database="db_xxxx", user="xxx", password="xxx", host="xxx.xx.xxx.xxx", port="5432")
     cur = conn.cursor()
+    cur.execute(
+        "CREATE TABLE IF NOT EXISTS db_xxx.xxx__vpn_pool "
+        "(complete_ip VARCHAR(25) PRIMARY KEY,ip_address VARCHAR(15),port INT,country VARCHAR(10),server_area VARCHAR(20),"
+        "category VARCHAR(4),http_type VARCHAR(10),transfer_speed VARCHAR(10),response_time VARCHAR(10),"
+        "network_operator VARCHAR(10),survived_time VARCHAR(10),verify_datetime VARCHAR(15),source_url VARCHAR(50),source_host VARCHAR(30));"
+    )
     main(11)#TODO
     cur.close()
     conn.close()
