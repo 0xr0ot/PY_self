@@ -167,6 +167,7 @@ class Inke:
 
 
 class Save:
+
     def __init__(self):
         self.headers = {'User-Agent': 'Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0; HTC; Titan)'}
         self.save_url = 'http://plugin.client.qxiu.com/video/cgi/thirdVideo/add'
@@ -204,7 +205,10 @@ class Save:
                                 , crawlTime VARCHAR(16) NOT NULL
                             );'''
         self.cur.execute(self.create_sql)
-
+    
+    def save_end(self):
+        self.cur.close()
+        self.conn.close()
 
     def link_to_content(self,link):
         res = requests.get(link,headers=self.headers)
@@ -219,10 +223,10 @@ class Save:
                 f.close()
 
     def save_info_db(self,dt):
-        sql = ('''INSERT INTO xxx.small_video 
-                  (key_id,platform,nickname,author_id,gender,charm,level,signature,city,location,
-                   video_title,duration,video_height,video_width,avatar_large,avatar_medium,avatar_thumb,
-                   video_cover,video_url,video_ctime,crawl_time)
+        save_sql = ('''INSERT INTO xxx.small_video 
+                  (keyId,platform,nickname,authorId,gender,charm,authorLevel,signature,city,location,
+                   videoTitle,duration,videoHeight,videoWidth,avatarLarge,avatarMedium,avatarThumb,
+                   videoCover,videoUrl,videoCtime,crawlTime)
                   VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',
                    '{15}','{16}','{17}','{18}','{19}','{20}');'''.format(
             dt['keyId'],dt['platform'],dt['nickname'],dt['authorId'],dt['gender'],dt['charm'],dt['authorLevel'],dt['signature'],
@@ -230,7 +234,7 @@ class Save:
             dt['avatarMedium'],dt['avatarThumb'],dt['videoCover'],dt['videoUrl'],dt['videoCtime'],dt['crawlTime'])
         )
         try:
-            self.cur.execute(sql)
+            self.cur.execute(save_sql)
             self.conn.commit()
         except pymysql.IntegrityError as e:
             print(e)
@@ -261,10 +265,11 @@ if __name__ == '__main__':
             sv.save_to_url(dt)
             print(sv.save_info_db(dt))
 
-
     for i in range(20):
         time.sleep(.3)
         data = IK.get_data()
         for dt in data:
             sv.save_to_url(dt)
             print(sv.save_info_db(dt))
+            
+    sv.save_end()
