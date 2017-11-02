@@ -29,28 +29,28 @@ class HuoShan:
                 else:
                     gender = 'Unknown'
                 yield {
-                    'key_id': 'HS_'+str(dt['create_time'] *1000)+'_'+dt['author']['id_str'],
+                    'keyId': 'HS_'+str(dt['create_time'] *1000)+'_'+dt['author']['id_str'],
                     'platform' : 'Huoshan',
                     'nickname': dt['author']['nickname'],
-                    'author_id': dt['author']['id_str'],
+                    'authorId': dt['author']['id_str'],
                     'gender': gender,
                     'charm': dt['author']['fan_ticket_count'],
-                    'level': dt['author']['level'],
+                    'authorLevel': dt['author']['level'],
                     'signature': dt['author']['signature'],
                     'city': dt['author']['city'],
                     'location': dt['location'],
-                    'video_title': dt['text'],
+                    'videoTitle': dt['text'],
                     'duration': dt['video']['duration'],
-                    'video_height': dt['video']['height'],
-                    'video_width': dt['video']['width'],
-                    'avatar_large': dt['author']['avatar_large']['url_list'][0],
-                    'avatar_medium': dt['author']['avatar_medium']['url_list'][0],
-                    'avatar_thumb': dt['author']['avatar_thumb']['url_list'][0],
-                    'video_cover': dt['video']['cover']['url_list'][0],
-                    'video_url': 'http://hotsoon.snssdk.com/hotsoon/item/video/_playback/?video_id={}&line=0'
+                    'videoHeight': dt['video']['height'],
+                    'videoWidth': dt['video']['width'],
+                    'avatarLarge': dt['author']['avatar_large']['url_list'][0],
+                    'avatarMedium': dt['author']['avatar_medium']['url_list'][0],
+                    'avatarThumb': dt['author']['avatar_thumb']['url_list'][0],
+                    'videoCover': dt['video']['cover']['url_list'][0],
+                    'videoUrl': 'http://hotsoon.snssdk.com/hotsoon/item/video/_playback/?video_id={}&line=0'
                                  '&watermark=0&app_id=1112'.format(dt['video']['uri']),
-                    'video_ctime': str(dt['create_time'] * 1000),
-                    'crawl_time': str(int(time.time()*1000))
+                    'videoCtime': str(dt['create_time'] * 1000),
+                    'crawlTime': str(int(time.time()*1000))
                 }
 
 
@@ -96,27 +96,27 @@ class KuaiShou:
                 else:
                     gender = 'Unknown'
                 yield {
-                    'key_id': 'KS_'+str(dt['timestamp'])+'_'+str(dt['user_id']),
+                    'keyId': 'KS_'+str(dt['timestamp'])+'_'+str(dt['user_id']),
                     'platform': 'Kuaishou',
                     'nickname': dt['user_name'],
-                    'author_id': str(dt['user_id']),
+                    'authorId': str(dt['user_id']),
                     'gender': gender,
                     'charm': dt['like_count'],
-                    'level': '',
+                    'authorLevel': '',
                     'signature': '',
                     'city': '',
                     'location': '',
-                    'video_title': dt['caption'],
+                    'videoTitle': dt['caption'],
                     'duration': '',
-                    'video_height': dt['ext_params']['h'],
-                    'video_width': dt['ext_params']['w'],
-                    'avatar_large': '',
-                    'avatar_medium': dt['headurls'][0]['url'],
-                    'avatar_thumb': '',
-                    'video_cover': dt['cover_thumbnail_urls'][0]['url'],
-                    'video_url': dt['main_mv_urls'][0]['url'],
-                    'video_ctime': str(dt['timestamp']),
-                    'crawl_time': str(int(time.time() *1000))
+                    'videoHeight': dt['ext_params']['h'],
+                    'videoWidth': dt['ext_params']['w'],
+                    'avatarLarge': '',
+                    'avatarMedium': dt['headurls'][0]['url'],
+                    'avatarThumb': '',
+                    'videoCover': dt['cover_thumbnail_urls'][0]['url'],
+                    'videoUrl': dt['main_mv_urls'][0]['url'],
+                    'videoCtime': str(dt['timestamp']),
+                    'crawlTime': str(int(time.time() *1000))
                 }
 
 
@@ -142,33 +142,34 @@ class Inke:
                 gender = 'Unknown'
             content = json.loads(dt['content'])
             yield {
-                'key_id': 'IK_' + dt['ctime']+ '_'+ str(dt['uid']),
+                'keyId': 'IK_' + dt['ctime']+ '_'+ str(dt['uid']),
                 'platform': 'Inke',
                 'nickname': dt['nickname'],
-                'author_id': str(dt['uid']),
+                'authorId': str(dt['uid']),
                 'gender': gender,
                 'charm': int(dt['likeCount']),
-                'level': int(dt['level']),
+                'authorLevel': int(dt['level']),
                 'signature': '',
                 'city': '',
                 'location': dt['location'],
-                'video_title': dt['title'] or dt['topicName'],
+                'videoTitle': dt['title'] or dt['topicName'],
                 'duration': '',
-                'video_height': '',
-                'video_width': '',
-                'avatar_large': '',
-                'avatar_medium': dt['portrait'],
-                'avatar_thumb': '',
-                'video_cover': content['scale_url'],
-                'video_url': content['mp4_url'],
-                'video_ctime': dt['ctime'],
-                'crawl_time': str(int(time.time() * 1000))
+                'videoHeight': '',
+                'videoWidth': '',
+                'avatarLarge': '',
+                'avatarMedium': dt['portrait'],
+                'avatarThumb': '',
+                'videoCover': content['scale_url'],
+                'videoUrl': content['mp4_url'],
+                'videoCtime': dt['ctime'],
+                'crawlTime': str(int(time.time() * 1000))
             }
 
 
 class Save:
     def __init__(self):
         self.headers = {'User-Agent': 'Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0; HTC; Titan)'}
+        self.save_url = 'http://plugin.client.qxiu.com/video/cgi/thirdVideo/add'
         self.conn = pymysql.connect(host='xxx.xx.xx.xxx',
                                     port=3306x,
                                     user='xxxx',
@@ -177,32 +178,33 @@ class Save:
                                     charset='utf8mb4',
                                     cursorclass=pymysql.cursors.DictCursor)
         self.cur = self.conn.cursor()
-        self.create_aql = '''
+        self.create_sql = '''
                                     CREATE TABLE IF NOT EXISTS xxx.small_video
                             (
-                                  key_id VARCHAR(32) NOT NULL PRIMARY KEY
+                                  keyId VARCHAR(32) NOT NULL PRIMARY KEY
                                 , platform VARCHAR(8) NOT NULL
                                 , nickname VARCHAR(16) NULL
-                                , author_id VARCHAR(16) NOT NULL
+                                , authorId VARCHAR(16) NOT NULL
                                 , gender VARCHAR(8) NOT NULL
                                 , charm INT NULL
-                                , level INT NULL
+                                , authorLevel INT NULL
                                 , signature VARCHAR(256) NULL
                                 , city VARCHAR(8) NULL
                                 , location VARCHAR(8) NULL
-                                , video_title VARCHAR(256) NULL
-                                , duration DECIMAL(5,3) NULL
-                                , video_height INT NULL
-                                , video_width INT NULL
-                                , avatar_large VARCHAR(256) NULL
-                                , avatar_medium VARCHAR(256) NOT NULL
-                                , avatar_thumb VARCHAR(256) NULL
-                                , video_cover VARCHAR(256) NOT NULL
-                                , video_url VARCHAR(256) NOT NULL
-                                , video_ctime VARCHAR(16) NULL
-                                , crawl_time VARCHAR(16) NOT NULL
+                                , videoTitle VARCHAR(256) NULL
+                                , duration FLOAT NULL
+                                , videoHeight INT NULL
+                                , videoWidth INT NULL
+                                , avatarLarge VARCHAR(256) NULL
+                                , avatarMedium VARCHAR(256) NOT NULL
+                                , avatarThumb VARCHAR(256) NULL
+                                , videoCover VARCHAR(256) NOT NULL
+                                , videoUrl VARCHAR(256) NOT NULL
+                                , videoCtime VARCHAR(16) NULL
+                                , crawlTime VARCHAR(16) NOT NULL
                             );'''
-        self.cur.execute(self.create_aql)
+        self.cur.execute(self.create_sql)
+
 
     def link_to_content(self,link):
         res = requests.get(link,headers=self.headers)
@@ -217,15 +219,15 @@ class Save:
                 f.close()
 
     def save_info_db(self,dt):
-        sql = ('''INSERT INTO xyl.small_video 
+        sql = ('''INSERT INTO xxx.small_video 
                   (key_id,platform,nickname,author_id,gender,charm,level,signature,city,location,
                    video_title,duration,video_height,video_width,avatar_large,avatar_medium,avatar_thumb,
                    video_cover,video_url,video_ctime,crawl_time)
                   VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}','{14}',
                    '{15}','{16}','{17}','{18}','{19}','{20}');'''.format(
-            dt['key_id'],dt['platform'],dt['nickname'],dt['author_id'],dt['gender'],dt['charm'],dt['level'],dt['signature'],
-            dt['city'],dt['location'],dt['video_title'],dt['duration'],dt['video_height'],dt['video_width'],dt['avatar_large'],
-            dt['avatar_medium'],dt['avatar_thumb'],dt['video_cover'],dt['video_url'],dt['video_ctime'],dt['crawl_time'])
+            dt['keyId'],dt['platform'],dt['nickname'],dt['authorId'],dt['gender'],dt['charm'],dt['authorLevel'],dt['signature'],
+            dt['city'],dt['location'],dt['videoTitle'],dt['duration'],dt['videoHeight'],dt['videoWidth'],dt['avatarLarge'],
+            dt['avatarMedium'],dt['avatarThumb'],dt['videoCover'],dt['videoUrl'],dt['videoCtime'],dt['crawlTime'])
         )
         try:
             self.cur.execute(sql)
@@ -234,6 +236,10 @@ class Save:
             print(e)
         return 'Save successfully!\r\n {0}'.format(dt)
 
+    def save_to_url(self,dt):
+        res = requests.post(self.save_url,data=dt)
+        return res
+
 
 if __name__ == '__main__':
     sv = Save()
@@ -241,21 +247,24 @@ if __name__ == '__main__':
     KS = KuaiShou()
     IK = Inke()
 
-    for i in range(100):
-        print(i)
-        time.sleep(1)
-        data = HS.get_data(i,1000)
+    for i in range(200):
+        time.sleep(.3)
+        data = HS.get_data(i)
         for dt in data:
+            sv.save_to_url(dt)
             print(sv.save_info_db(dt))
 
     for i in range(10):
-        time.sleep(1)
+        time.sleep(.3)
         data = KS.get_data()
         for dt in data:
+            sv.save_to_url(dt)
             print(sv.save_info_db(dt))
 
-    for i in range(10):
-        time.sleep(1)
+
+    for i in range(20):
+        time.sleep(.3)
         data = IK.get_data()
         for dt in data:
+            sv.save_to_url(dt)
             print(sv.save_info_db(dt))
