@@ -167,7 +167,6 @@ class Inke:
 
 
 class Save:
-
     def __init__(self):
         self.headers = {'User-Agent': 'Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0; HTC; Titan)'}
         self.save_url = 'http://plugin.client.qxiu.com/video/cgi/thirdVideo/add'
@@ -205,7 +204,7 @@ class Save:
                                 , crawlTime VARCHAR(16) NOT NULL
                             );'''
         self.cur.execute(self.create_sql)
-    
+
     def save_end(self):
         self.cur.close()
         self.conn.close()
@@ -251,25 +250,26 @@ if __name__ == '__main__':
     KS = KuaiShou()
     IK = Inke()
 
-    for i in range(200):
-        time.sleep(.3)
-        data = HS.get_data(i)
-        for dt in data:
-            sv.save_to_url(dt)
-            print(sv.save_info_db(dt))
-
-    for i in range(10):
-        time.sleep(.3)
-        data = KS.get_data()
-        for dt in data:
-            sv.save_to_url(dt)
-            print(sv.save_info_db(dt))
-
-    for i in range(20):
-        time.sleep(.3)
-        data = IK.get_data()
-        for dt in data:
-            sv.save_to_url(dt)
-            print(sv.save_info_db(dt))
-            
-    sv.save_end()
+    try:
+        for i in range(200):
+            time.sleep(.3)
+            data = HS.get_data(i)
+            for dt in data:
+                sv.save_to_url(dt)
+                print(sv.save_info_db(dt))
+    
+        for i in range(10):
+            time.sleep(.3)
+            data = KS.get_data()
+            for dt in data:
+                sv.save_to_url(dt)
+                print(sv.save_info_db(dt))
+    
+        for i in range(20):
+            time.sleep(.3)
+            data = IK.get_data()
+            for dt in data:
+                sv.save_to_url(dt)
+                print(sv.save_info_db(dt))
+    finally:
+        sv.save_end()
