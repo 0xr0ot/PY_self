@@ -122,7 +122,12 @@ class KuaiShou:
 
 class Inke:
     def __init__(self):
-        self.url = 'http://116.211.167.106/api/feeds_tab/recommends?cc=TG36001&lc=3ef688bc40198108&mtxid=d0ee0728222e&devi=862177031894002&sid=20MCQVnazERp6Yi2qe5usEeRgCAqmni19dG9c9sMqkm0AIIqjOWF&osversion=android_23&cv=IK5.0.10_Android&imei=862177031894002&proto=7&conn=wifi&ua=LeMobileLeX820&logid=262%2C269%2C209%2C234%2C236&uid=603554151&icc=&vv=1.0.3-201610121413.android&aid=38a52b90ecd7b381&smid=DudQ1IMizexZyWmy%2BHaN%2FKqGra2unALU9UUbCI11dLHyfwsb32iUYsUO4FsHQCAYpC2hYmV1CccKe9E375uhA9yQ&imsi=&mtid=bdba779f457452c613f93fa8060d46e8&latitude=200&video_topic_disable=0&start=10&longitude=200&limit=30'
+        self.url = 'http://116.211.167.106/api/feeds_tab/recommends?cc=TG36001&lc=3ef688bc40198108&mtxid=d0ee0728222e&' \
+                   'devi=862177031894002&sid=20MCQVnazERp6Yi2qe5usEeRgCAqmni19dG9c9sMqkm0AIIqjOWF&osversion=android_23&' \
+                   'cv=IK5.0.10_Android&imei=862177031894002&proto=7&conn=wifi&ua=LeMobileLeX820&logid=262%2C269%2C209%2C234%2C236&' \
+                   'uid=603554151&icc=&vv=1.0.3-201610121413.android&aid=38a52b90ecd7b381&' \
+                   'smid=DudQ1IMizexZyWmy%2BHaN%2FKqGra2unALU9UUbCI11dLHyfwsb32iUYsUO4FsHQCAYpC2hYmV1CccKe9E375uhA9yQ&' \
+                   'imsi=&mtid=bdba779f457452c613f93fa8060d46e8&latitude=200&video_topic_disable=0&start=10&longitude=200&limit=30'
         self.headers = {
             'Host': '116.211.167.106',
             'Connection': 'Keep-Alive',
