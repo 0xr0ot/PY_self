@@ -2,9 +2,9 @@
 #author:uliontse
 
 import time
+import pymysql
 import requests
 from bs4 import BeautifulSoup
-import pymysql
 from pprint import pprint as ppt
 
 
@@ -55,3 +55,4 @@ if __name__ == '__main__':
     bg = Begin()
     #ppt(bg.get_durTime())
     ppt(bg.get_plat())
+    bg.end()
