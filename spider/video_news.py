@@ -4,6 +4,7 @@
 import re
 import time
 import requests
+import pymysql
 from html import unescape
 from bs4 import BeautifulSoup
 from urllib.parse import urlencode
@@ -63,8 +64,7 @@ class BaiduNews:
 
 
     def get_html(self,link):
-        res = requests.get(link)
-        #print(res.text)
+        res = requests.get(link,headers={'User-Agent':self.headers['User-Agent']})
         if 'charset="' in res.text:
             pattern = re.compile('charset="(.*?)"',re.S)
             res.encoding = re.findall(pattern,res.text)[0]
@@ -77,47 +77,77 @@ class BaiduNews:
         else:
             res.encoding = 'utf-8'
         html = res.text
+        #print(html)
         return html
 
 
     def parse_choose(self,html):
         soup = BeautifulSoup(html, 'lxml')
 
-        if 'id="main_content"' in html:
+        if ('id="main_content"' and 'ifengimg.com/ifeng/') in html:
+            print('ifeng')
             contents = soup.find_all('div',{'id':'main_content'}) #凤凰网
             return contents[0].get_text()
 
         elif ('articleInfo: {' in html) and ('&gt;&lt' in html): #头条
+            print('toutiao')
             pattern = re.compile("content: '(.*?)'")
             contents = re.findall(pattern,html)[0]
             normal_text = BeautifulSoup(unescape(contents),'lxml')
             return normal_text.get_text()
 
         elif 'id="js_content"' in html:
+            print('weixin')
             contents = soup.find_all('div',{'id':'js_content'}) #微信文章
             return contents[0].get_text()
 
         elif 'id="artibody"' in html:
+            print('sina')
             contents = soup.find_all('div',{"id":"artibody"}) #新浪
             return contents[0].get_text()
 
-        elif 'class="article"' in html:
+        elif ('class="article"' and 'sohu.com/tag/') in html:
+            print('sohu')
             contents = soup.find_all('article',{'class':'article'}) #搜狐
             return contents[0].get_text()
 
+        elif ('id=bd_article' and '360_' and 'class=content')in html:
+            print('qihoo')
+            contents = soup.find_all('article') # 今日爆点(360)
+            return contents[0].get_text()
+
         elif 'id="endText"' in html:
+            print('163NetEase')
             contents = soup.find_all('div',{'id':'endText'}) #网易
             return contents[0].get_text()
 
+        elif ('id="content-text"' and 'btime.com') in html:
+            print('btime')
+            contents = soup.find_all('div',{'id':'content-text'}) #北京时间
+            return contents[0].get_text()[:-40]
+
+        elif ('id="article_content' and 'static.huxiucdn.com/www/') in html:
+            print('huxiu')
+            contents = soup.find_all('div',{'class':'article-content-wrap'}) #虎嗅网
+            return contents[0].get_text()
+
+        elif ('class="article-cont"' and 'news.zol.com.cn/more') in html:
+            print('ZOL')
+            contents =soup.find_all('div',{'class':'article-cont'}) #中关村在线
+            return contents[0].get_text()[:-200].replace('\xa0','')
+
         elif 'id="contentMain"' in html:
+            print('gmw')
             contents = soup.find_all('div',{'id':'contentMain'}) #光明网
             return contents[0].get_text()
 
         elif 'id="content"' in html:
+            print('southcn or ITBEAR')
             contents = soup.find_all('div',{'id':'content'}) #南方网、ITBEAR
             return contents[0].get_text()
 
         elif 'class="news-con"' in html:
+            print('dzwww')
             contents = soup.find_all('div',{'class':'news-con'}) #大众网
             return contents[0].get_text()
         else:
@@ -135,7 +165,7 @@ class BaiduNews:
 def run():
     news = BaiduNews()
     #soup = news.get_index_soup('陌陌')
-    html = news.get_html(link10)
+    html = news.get_html(link15)
     contents = news.parse_choose(html)
     aa = news.get_content(contents)
     print(aa)
@@ -159,4 +189,11 @@ if __name__ == '__main__':
     link10= 'https://mp.weixin.qq.com/s?__biz=MjM5MDI1ODUyMA==&mid=2672939627&idx=1&sn=14d587f0ccf8bf459406e3de1b189504&' \
             'chksm=bce2f65c8b957f4a72acbccb0cba549898bb39a582a67265df5b502823e3a87e1fcb8202ca11&mpshare=1&scene=1&' \
             'srcid=1117YeA0NLTDwKLvHM9kcnmQ&pass_ticket=W%2FN7x5QMxuwmbIEiD9OZsm%2BZ0U181Ugx3dgWlUW1OEJiHDVyRt5%2F8L4tbKWACFja#rd' #weixin
+    link11= 'http://sh.qihoo.com/pc/detail?360newsdetail=1&_sign=searchdet&check=36788aab903e770a&sign=360_e39369d1&' \
+            'url=http://www.yulefm.com/news/2017-10-31/145085.html' # 今日爆点(360)
+    link12= 'https://item.btime.com/wm/427iajh3vuq8goruch18qschtuo' #北京时间
+    link13= 'https://www.huxiu.com/article/222579.html' # 虎嗅网
+    link14= 'http://news.zol.com.cn/659/6590172.html' # 中关村在线
+    link15= 'http://news.zol.com.cn/666/6661050.html'
+
     run()
