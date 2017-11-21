@@ -35,11 +35,11 @@ class VideoNews:
                       'BD_CK_SAM=1; PSINO=1; BDSVRTM=143; H_PS_PSSID='.format(self.tm1-82207,self.tm1-81353,self.tm1-798,self.tm1-798,self.tm0)
         }
         #TODO
-        # self.conn = pymysql.connect(host='123.59.20.50',port=33066,user='qxiu_user',password='c9Lmb6Wu29RGX!c',
-        #                             database='qxiu_bi2',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
+        # self.conn = pymysql.connect(host='xxxx50',port=33066,user='xxx',password='xxx',
+        #                             database='xx',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
         # self.cur = self.conn.cursor()
         # self.create_sql = '''
-        #                                 CREATE TABLE IF NOT EXISTS xyl__VideoNews
+        #                                 CREATE TABLE IF NOT EXISTS xxx__VideoNews
         #                         (
         #                               keyId VARCHAR(32) NOT NULL PRIMARY KEY
         #                             , crawlTime VARCHAR(16) NOT NULL
@@ -54,7 +54,7 @@ class VideoNews:
     def get_baidu_soup(self,keyword,page=0):
         if page == 0:
             # 'ct'=0: TimeOrder, 'ct'=1: FocusOrder; 'tn'='news' or 'newstitle'.
-            param = {'ct':0, 'rn':20, 'ie':'utf-8', 'cl':2, 'tn':'newstitle', 'word':keyword, 'bs':keyword, 'rsv_bp':1,'sr':0, 'f':8, 'prevct':'no',}
+            param = {'ct':0, 'rn':20, 'ie':'utf-8', 'cl':2, 'tn':'newstitle', 'word':keyword, 'bs':keyword, 'rsv_bp':1,'sr':0, 'f':8, 'prevct':'no'}
         else:
             pageN = 20 * page
             param = {'ct':0, 'rn':20, 'ie':'utf-8', 'cl':2, 'tn':'newstitle', 'word':'intitle:('+keyword+')', 'bt':0, 'et':0, 'pn':pageN}
