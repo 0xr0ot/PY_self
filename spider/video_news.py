@@ -5,6 +5,7 @@ import re
 import time
 import requests
 import pymysql
+import jieba.analyse
 from html import unescape
 from bs4 import BeautifulSoup
 from urllib.parse import urlencode
@@ -34,35 +35,32 @@ class VideoNews:
                       'BDRCVFR[C0p6oIjvx-c]=mk3SLVN4HKm; WWW_ST={4}; BDRCVFR[uLXjBGr0i56]=mbxnW11j9Dfmh7GuZR8mvqV; '
                       'BD_CK_SAM=1; PSINO=1; BDSVRTM=143; H_PS_PSSID='.format(self.tm1-82207,self.tm1-81353,self.tm1-798,self.tm1-798,self.tm0)
         }
-        self.conn = pymysql.connect(host='xxxxx',
-                                    port=33066,user='xxx',
+        self.conn = pymysql.connect(host='xxxx',
+                                    port=33066,
+                                    user='xxxx',
                                     password='xxxx',
                                     database='xxxx',
                                     charset='utf8mb4',
                                     cursorclass=pymysql.cursors.DictCursor)
         self.cur = self.conn.cursor()
-        self.create_sql = '''
-                            CREATE TABLE IF NOT EXISTS xxxx.xyl__VideoNews
+        self.create_sql =   '''
+                            CREATE TABLE IF NOT EXISTS qxiu_bi2.xyl__VideoNews
                                 (
                                       title VARCHAR(64) NOT NULL PRIMARY KEY
-                                    , crawlTime VARCHAR(16) NOT NULL
+                                    , crawlTime INT(10) NOT NULL
                                     , keyword VARCHAR(8) NOT NULL 
-                                    , length INT(8) NOT NULL 
-                                    , publish VARCHAR(16) NOT NULL 
-                                    , date VARCHAR(16) NOT NULL 
+                                    , length INT(4) NOT NULL 
+                                    , publish VARCHAR(32) NOT NULL 
+                                    , pubDate VARCHAR(32) NOT NULL 
                                     , word_TF VARCHAR(64) NULL 
                                     , word_RANK VARCHAR(64) NULL 
                                     , emotion VARCHAR(8) NULL
-                                    , img VARCHAR(256) NULL
+                                    , image VARCHAR(256) NULL
                                     , video VARCHAR(64) NULL 
-                                    , link VARCHAR(64) NOT NULL 
-                                    , content TEXT(6400) NULL
+                                    , link VARCHAR(256) NOT NULL 
+                                    , content TEXT NULL
                                 );'''
         self.cur.execute(self.create_sql)
-
-    def save_end(self):
-        self.cur.close()
-        self.conn.close()
 
 
     def get_baidu_soup(self,keyword,page=0):
@@ -95,7 +93,7 @@ class VideoNews:
             org = it.get_text().split('\xa0\xa0') #space
             org_publish.append(org[0])
             org_date.append(org[1])
-        org_dic = {'publish': org_publish, 'date': org_date}
+        org_dic = {'publish': org_publish, 'pubDate': org_date}
         return org_dic
 
 
@@ -115,10 +113,7 @@ class VideoNews:
         else:
             res.encoding = res.encoding
         #print(res.encoding)
-        html = res.text
-        #print(html)
-        return html
-
+        return res.text
 
 
     def get_content(self,html):
@@ -218,13 +213,12 @@ class VideoNews:
             print('--southcn or ITBEAR--')
             contents = soup.find_all('div',{'id':'content'}) #南方网、ITBEAR
             return contents[0].get_text()
-        #TODO
         else:
             try:
-                print('瑞士军刀！')
                 para = ''
                 contents = soup.find_all('div')  ###
-                for content in contents[0].find_all('p'):
+                print('瑞士军刀！')
+                for content in contents[1].find_all('p'): ## avoid of navigate bar.
                     para += content.get_text()
                 if len(para)<500:
                     return ''
@@ -232,7 +226,6 @@ class VideoNews:
             except:
                 print('--Unknown--')
                 return ''
-
 
 
     def gene_data(self,keyword,page):
@@ -244,7 +237,7 @@ class VideoNews:
         for link in link_dic['link']:
             html = self.get_html(link)
             para = self.get_content(html)
-            para = para.strip().replace('   ','').replace('\xa0','').replace('\u3000\u3000','')
+            para = para.strip().replace('   ','').replace('\xa0','').replace('\u3000\u3000','') # clean the text.
             para = para.replace('\n\n','').replace('\n \n','\n')
             con_pool.append(para)
             len_pool.append(len(para.replace('\n','').replace(' ','')))
@@ -258,32 +251,56 @@ class VideoNews:
                 'keyword': keyword,
                 'title': link_dic['title'][i],
                 'link': link_dic['link'][i],
-                'date': link_dic['date'][i],
+                'pubDate': link_dic['pubDate'][i],
                 'publish': link_dic['publish'][i],
                 'length': link_dic['length'][i],
                 'content': link_dic['content'][i]
             }
             yield data
 
+
     def save_data(self,dt):
-        save_sql = ('''INSERT INTO xxx.small__video 
-                  (title,crawlTime,keyword,length,publish,date,)
-                  VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}');'''.format(
-            dt['keyId'],dt['keyId'])#TODO
-        )
+        save_sql =  '''
+                    INSERT INTO qxiu_bi2.xyl__VideoNews 
+                        (title,crawlTime,keyword,length,publish,pubDate,word_TF,word_RANK,emotion,image,video,link,content) 
+                    VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}');
+                    '''.format(
+                        dt['title'],int(time.time()),dt['keyword'],dt['length'],dt['publish'],dt['pubDate'],'','','','','',
+                        dt['link'],dt['content']
+                    )
         try:
             self.cur.execute(save_sql)
             self.conn.commit()
         except pymysql.IntegrityError as e:
             print(e)
         return 'Save successfully!\r\n {0}'.format(dt)
+    
+    
+    def save_end(self):
+        self.cur.close()
+        self.conn.close()
+        
+
+    #TODO nlp
+    def ext(sentence, method='TF-IDF'):
+        if method == 'TF-IDF':
+            result = jieba.analyse.extract_tags(sentence, topK=10, allowPOS=('ns', 'n', 'vn', 'v'))
+            return result
+        if method == 'TextRank':
+            result = jieba.analyse.textrank(sentence, topK=10, allowPOS=('ns', 'n', 'vn', 'v'))
+            return result
 
 
 if __name__ == '__main__':
     news = VideoNews()
-    zb = news.gene_data('直播行业',0)
-    for zz in zb:
-        ppt(zz)
+    data = news.gene_data('video',0)
+    try:
+        for dt in data:
+            print(dt)
+            #ppt(news.save_data(dt))
+    finally:
+        news.save_end()
+
 
 
     # link1 = 'http://e.gmw.cn/2017-11/16/content_26806647.htm' #光明网
