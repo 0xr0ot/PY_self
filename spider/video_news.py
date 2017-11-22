@@ -104,6 +104,7 @@ class VideoNews:
         return html
 
 
+
     def get_content(self,html):
         soup = BeautifulSoup(html, 'lxml')
 
@@ -119,10 +120,14 @@ class VideoNews:
             normal_text = BeautifulSoup(unescape(contents),'lxml')
             return normal_text.get_text()
 
-        elif ('id="js_content"' and 'res.wx.qq.com/mmbizwap/zh_CN') in html:
+        elif ('id = "Cnt-Main-Article-QQ"' and 'http://www.qq.com/map/') in html:
+            print('--tencent--')
+            contents = soup.find_all('div',{'id':'Cnt-Main-Article-QQ'}) #腾讯新闻(无vlike)
+            return contents[0].get_text()
+
+        elif ('id="js_content"' and 'mp.weixin.qq.com') in html:
             print('--weixin--')
             contents = soup.find_all('div',{'id':'js_content'}) #微信公众号
-            #print(contents)
             return contents[0].get_text()
 
         elif ('id="artibody"' and 'www.sina.com.cn') in html:
@@ -133,11 +138,6 @@ class VideoNews:
         elif ('class="article"' and 'sohu.com/tag/') in html:
             print('--sohu--')
             contents = soup.find_all('article',{'class':'article'}) #搜狐
-            return contents[0].get_text()
-
-        elif ('class="content"' and 'http://static.bjnews.com.cn/www/') in html:
-            print('--bjnews--')
-            contents = soup.find_all('div',{'class':'content'}) #新京报
             return contents[0].get_text()
 
         elif ('id=bd_article' and 'http://kc.look.360.cn')in html:
@@ -163,6 +163,11 @@ class VideoNews:
                 para += content.get_text()
             return para
 
+        elif ('class="content-bd"' and 'tousu@yidian-inc.com') in html:
+            print('yidianzixun')
+            contents = soup.find_all('div',{'class':'content-bd'}) #一点资讯
+            return contents[0].get_text()
+
         elif ('id="article_content' and 'static.huxiucdn.com/www/') in html:
             print('--huxiu--')
             contents = soup.find_all('div',{'class':'article-content-wrap'}) #虎嗅网
@@ -183,7 +188,7 @@ class VideoNews:
             contents = soup.find_all('div',{'class':'news-con'}) #大众网
             return contents[0].get_text()
 
-        elif ('id="content"' or 'http://m.itbear.com.cn' or 'http://www.newsgd.com/') in html:
+        elif (('id="content"' and 'http://m.itbear.com.cn') or ('id="content"' and 'http://www.newsgd.com/')) in html:
             print('--southcn or ITBEAR--')
             contents = soup.find_all('div',{'id':'content'}) #南方网、ITBEAR
             return contents[0].get_text()
@@ -191,6 +196,7 @@ class VideoNews:
         else:
             print('--Unknown--')
             return ''
+
 
 
 def run(keyword,page):
