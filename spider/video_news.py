@@ -143,8 +143,16 @@ class VideoNews:
 
         elif ('id="artibody"' and 'http://corp.sina.com.cn/chn/sina_job.html') in html:
             print('--sina--')
-            contents = soup.find_all('div',{"id":"artibody"}) #新浪
-            return contents[0].get_text()
+            try:
+                contents = soup.find_all('div',{"id":"artibody"}) #新浪
+                return contents[0].get_text()
+            except:
+                contents = soup.find_all('div',{'id':'articleContent'}) #新浪汽车
+                para = contents[0].get_text()
+                para1 = para.split(';padding:0;margin:0;}')[1]
+                para2 = para1.split('文章关键词：')[0]
+                return para2
+
 
         elif ('class="article"' and 'sohu.com/tag/') in html:
             print('--sohu--')
@@ -216,9 +224,9 @@ class VideoNews:
         else:
             try:
                 para = ''
-                contents = soup.find_all('div')  ###
+                contents = soup.find_all('p')  ###
                 print('瑞士军刀！')
-                for content in contents[1].find_all('p'): ## avoid of navigate bar.
+                for content in contents: ## avoid of navigate bar.
                     para += content.get_text()
                 if len(para)<500:
                     return ''
@@ -274,12 +282,12 @@ class VideoNews:
         except pymysql.IntegrityError as e:
             print(e)
         return 'Save successfully!\r\n {0}'.format(dt)
-    
-    
+
+
     def save_end(self):
         self.cur.close()
         self.conn.close()
-        
+
 
     #TODO nlp
     def ext(sentence, method='TF-IDF'):
@@ -297,7 +305,7 @@ if __name__ == '__main__':
     try:
         for dt in data:
             print(dt)
-            #ppt(news.save_data(dt))
+            ppt(news.save_data(dt))
     finally:
         news.save_end()
 
