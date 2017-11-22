@@ -34,30 +34,46 @@ class VideoNews:
                       'BDRCVFR[C0p6oIjvx-c]=mk3SLVN4HKm; WWW_ST={4}; BDRCVFR[uLXjBGr0i56]=mbxnW11j9Dfmh7GuZR8mvqV; '
                       'BD_CK_SAM=1; PSINO=1; BDSVRTM=143; H_PS_PSSID='.format(self.tm1-82207,self.tm1-81353,self.tm1-798,self.tm1-798,self.tm0)
         }
-        #TODO
-        # self.conn = pymysql.connect(host='xxxx50',port=33066,user='xxx',password='xxx',
-        #                             database='xx',charset='utf8mb4',cursorclass=pymysql.cursors.DictCursor)
-        # self.cur = self.conn.cursor()
-        # self.create_sql = '''
-        #                                 CREATE TABLE IF NOT EXISTS xxx__VideoNews
-        #                         (
-        #                               keyId VARCHAR(32) NOT NULL PRIMARY KEY
-        #                             , crawlTime VARCHAR(16) NOT NULL
-        #                         );'''
-        # self.cur.execute(self.create_sql)
+        self.conn = pymysql.connect(host='xxxxx',
+                                    port=33066,user='xxx',
+                                    password='xxxx',
+                                    database='xxxx',
+                                    charset='utf8mb4',
+                                    cursorclass=pymysql.cursors.DictCursor)
+        self.cur = self.conn.cursor()
+        self.create_sql = '''
+                            CREATE TABLE IF NOT EXISTS xxxx.xyl__VideoNews
+                                (
+                                      title VARCHAR(64) NOT NULL PRIMARY KEY
+                                    , crawlTime VARCHAR(16) NOT NULL
+                                    , keyword VARCHAR(8) NOT NULL 
+                                    , length INT(8) NOT NULL 
+                                    , publish VARCHAR(16) NOT NULL 
+                                    , date VARCHAR(16) NOT NULL 
+                                    , word_TF VARCHAR(64) NULL 
+                                    , word_RANK VARCHAR(64) NULL 
+                                    , emotion VARCHAR(8) NULL
+                                    , img VARCHAR(256) NULL
+                                    , video VARCHAR(64) NULL 
+                                    , link VARCHAR(64) NOT NULL 
+                                    , content TEXT(6400) NULL
+                                );'''
+        self.cur.execute(self.create_sql)
 
-    # def save_end(self):
-    #     self.cur.close()
-    #     self.conn.close()
+    def save_end(self):
+        self.cur.close()
+        self.conn.close()
 
 
     def get_baidu_soup(self,keyword,page=0):
         if page == 0:
             # 'ct'=0: TimeOrder, 'ct'=1: FocusOrder; 'tn'='news' or 'newstitle'.
-            param = {'ct':0, 'rn':20, 'ie':'utf-8', 'cl':2, 'tn':'newstitle', 'word':keyword, 'bs':keyword, 'rsv_bp':1,'sr':0, 'f':8, 'prevct':'no'}
+            param = {'ct':0,'rn':20,'ie':'utf-8','cl':2,'tn':'newstitle','word':keyword,'bs':keyword,
+                     'rsv_bp':1,'sr':0,'f':8,'prevct':'no'}
         else:
             pageN = 20 * page
-            param = {'ct':0, 'rn':20, 'ie':'utf-8', 'cl':2, 'tn':'newstitle', 'word':'intitle:('+keyword+')', 'bt':0, 'et':0, 'pn':pageN}
+            param = {'ct':0,'rn':20,'ie':'utf-8','cl':2,'tn':'newstitle','word':'intitle:('+keyword+')',
+                     'bt':0,'et':0,'pn':pageN}
         res = requests.get(self.host,params=urlencode(param),headers=self.headers)
         soup = BeautifulSoup(res.text,'lxml')
         return soup
@@ -74,12 +90,12 @@ class VideoNews:
 
     def get_baidu_origin(self,soup):
         item = soup.find_all('div',{'class': 'c-title-author'})
-        org_public,org_date = [],[]
+        org_publish,org_date = [],[]
         for it in item:
             org = it.get_text().split('\xa0\xa0') #space
-            org_public.append(org[0])
+            org_publish.append(org[0])
             org_date.append(org[1])
-        org_dic = {'public': org_public, 'date': org_date}
+        org_dic = {'publish': org_publish, 'date': org_date}
         return org_dic
 
 
@@ -92,13 +108,13 @@ class VideoNews:
             res.encoding = 'utf-8'
         elif ('charset=gb2312' or 'charset=GB2312') in res.text:
             res.encoding = 'gb2312'
-        elif (('charset=GBK' or 'charset=gbk') in res.text) or res.encoding=='ISO-8859-1':
+        elif ((('charset=GBK' or 'charset=gbk') in res.text) or (res.encoding=='ISO-8859-1')):
             res.encoding = 'GBK'
         elif 'charset=cp936' in res.text:
             res.encoding = 'cp936'
         else:
             res.encoding = res.encoding
-        print(res.encoding)
+        #print(res.encoding)
         html = res.text
         #print(html)
         return html
@@ -169,13 +185,18 @@ class VideoNews:
             return para
 
         elif ('class="content-bd"' and 'tousu@yidian-inc.com') in html:
-            print('yidianzixun')
+            print('--yidianzixun--')
             contents = soup.find_all('div',{'class':'content-bd'}) #一点资讯
             return contents[0].get_text()
 
         elif ('id="article_content' and 'static.huxiucdn.com/www/') in html:
             print('--huxiu--')
             contents = soup.find_all('div',{'class':'article-content-wrap'}) #虎嗅网
+            return contents[0].get_text()
+
+        elif ('class="article-content"' and 'contact@geekpark.net') in html:
+            print('--geekpark--')
+            contents = soup.find_all('div',{'class':'article-content'}) #极客公园
             return contents[0].get_text()
 
         elif ('class="article-cont"' and 'news.zol.com.cn/more') in html:
@@ -199,38 +220,70 @@ class VideoNews:
             return contents[0].get_text()
         #TODO
         else:
-            print('--Unknown--')
-            return ''
+            try:
+                print('瑞士军刀！')
+                para = ''
+                contents = soup.find_all('div')  ###
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                if len(para)<500:
+                    return ''
+                return para
+            except:
+                print('--Unknown--')
+                return ''
 
 
 
-def run(keyword,page):
-    news = VideoNews()
-    soup = news.get_baidu_soup(keyword,page)
-    link_dic = news.get_baidu_links(soup)
-    org_dic = news.get_baidu_origin(soup)
-    #ppt(link_dic)
-    #ppt(org_dic)
+    def gene_data(self,keyword,page):
+        soup = self.get_baidu_soup(keyword,page)
+        link_dic = self.get_baidu_links(soup)
+        org_dic = self.get_baidu_origin(soup)
 
-    con_pool,len_pool = [],[]
-    for link in link_dic['link']:
-        html = news.get_html(link)
-        para = news.get_content(html).strip()
-        con_pool.append(para)
-        len_pool.append(len(para.replace('\n','').replace(' ','')))
-    cont_dic = {'content':con_pool, 'length':len_pool}
-    #ppt(cont_dic)
-    link_dic.update(org_dic)
-    link_dic.update(cont_dic)
-    return link_dic
+        con_pool,len_pool = [],[]
+        for link in link_dic['link']:
+            html = self.get_html(link)
+            para = self.get_content(html)
+            para = para.strip().replace('   ','').replace('\xa0','').replace('\u3000\u3000','')
+            para = para.replace('\n\n','').replace('\n \n','\n')
+            con_pool.append(para)
+            len_pool.append(len(para.replace('\n','').replace(' ','')))
 
+        cont_dic = {'content':con_pool, 'length':len_pool}
+        link_dic.update(org_dic)
+        link_dic.update(cont_dic)
 
-#TODO
+        for i,j in enumerate(link_dic['link']):
+            data = {
+                'keyword': keyword,
+                'title': link_dic['title'][i],
+                'link': link_dic['link'][i],
+                'date': link_dic['date'][i],
+                'publish': link_dic['publish'][i],
+                'length': link_dic['length'][i],
+                'content': link_dic['content'][i]
+            }
+            yield data
+
+    def save_data(self,dt):
+        save_sql = ('''INSERT INTO xxx.small__video 
+                  (title,crawlTime,keyword,length,publish,date,)
+                  VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}');'''.format(
+            dt['keyId'],dt['keyId'])#TODO
+        )
+        try:
+            self.cur.execute(save_sql)
+            self.conn.commit()
+        except pymysql.IntegrityError as e:
+            print(e)
+        return 'Save successfully!\r\n {0}'.format(dt)
+
 
 if __name__ == '__main__':
-    zb = run('直播行业',0)
-    for zz in zb.values():
-        ppt(zz[0])
+    news = VideoNews()
+    zb = news.gene_data('直播行业',0)
+    for zz in zb:
+        ppt(zz)
 
 
     # link1 = 'http://e.gmw.cn/2017-11/16/content_26806647.htm' #光明网
