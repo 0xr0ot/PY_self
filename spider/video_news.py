@@ -125,12 +125,12 @@ class VideoNews:
             contents = soup.find_all('div',{'id':'Cnt-Main-Article-QQ'}) #腾讯新闻(无vlike)
             return contents[0].get_text()
 
-        elif ('id="js_content"' and 'mp.weixin.qq.com') in html:
+        elif ('id="js_content"' and 'res.wx.qq.com/mmbizwap/zh_CN') in html:
             print('--weixin--')
             contents = soup.find_all('div',{'id':'js_content'}) #微信公众号
             return contents[0].get_text()
 
-        elif ('id="artibody"' and 'www.sina.com.cn') in html:
+        elif ('id="artibody"' and 'http://corp.sina.com.cn/chn/sina_job.html') in html:
             print('--sina--')
             contents = soup.find_all('div',{"id":"artibody"}) #新浪
             return contents[0].get_text()
@@ -138,6 +138,11 @@ class VideoNews:
         elif ('class="article"' and 'sohu.com/tag/') in html:
             print('--sohu--')
             contents = soup.find_all('article',{'class':'article'}) #搜狐
+            return contents[0].get_text()
+
+        elif ('class="content"' and 'http://static.bjnews.com.cn/www/') in html:
+            print('--bjnews--')
+            contents = soup.find_all('div',{'class':'content'}) #新京报
             return contents[0].get_text()
 
         elif ('id=bd_article' and 'http://kc.look.360.cn')in html:
@@ -150,12 +155,12 @@ class VideoNews:
             contents = soup.find_all('div',{'id':'endText'}) #网易
             return contents[0].get_text()
 
-        elif ('id="content-text"' and 'btime.com') in html:
+        elif ('id="content-text"' and 'www.btime.com/aboutus.html') in html:
             print('--btime--')
             contents = soup.find_all('div',{'id':'content-text'}) #北京时间
             return contents[0].get_text()[:-40]
 
-        elif ('class="content"' and 'http://new.xiaohulu.com/') in html:
+        elif ('class="content"' and 'kf@xiaohulu.com') in html:
             print('--xiaohulu--')
             para = ''
             contents = soup.find_all('div',{'class':'content'}) #小葫芦
