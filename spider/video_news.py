@@ -171,7 +171,7 @@ class VideoNews:
                     para = contents[0].get_text().replace('$','')
                     para1 = para.split(';padding:0;margin:0;}')[1]
                     para2 = para1.split('文章关键词：')[0]
-                    para3 = para2.split('。文章纠错')[0]
+                    para3 = para2.split('。文章纠错')[0] #TODO
                     if (('script' in para3) or ('var' in para3) or ('function' in para3)):
                         return ''
                     return para3
@@ -384,6 +384,11 @@ if __name__ == '__main__':
 
     #恢复<p>标签
     #加入encoding
+    #去掉每轮para的\\t\\n\\r,尾部加上\n
+    #每个para检查是否有script,有则+''.
+    #解析模块优化，如{'ifeng':['div','id','content','"','"']}
+    #第一性原理
+    
     #怎么 好用吗
 
     # link1 = 'http://e.gmw.cn/2017-11/16/content_26806647.htm' #光明网
