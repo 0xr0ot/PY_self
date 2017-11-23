@@ -3,8 +3,9 @@
 
 import re
 import time
-import requests
+import random
 import pymysql
+import requests
 import jieba.analyse
 from html import unescape
 from bs4 import BeautifulSoup
@@ -44,7 +45,7 @@ class VideoNews:
                                     cursorclass=pymysql.cursors.DictCursor)
         self.cur = self.conn.cursor()
         self.create_sql =   '''
-                            CREATE TABLE IF NOT EXISTS qxiu_bi2.xyl__VideoNews
+                            CREATE TABLE IF NOT EXISTS qxiu_bi2.xyl__VideoNews_v1
                                 (
                                       title VARCHAR(64) NOT NULL PRIMARY KEY
                                     , crawlTime INT(10) NOT NULL
@@ -61,6 +62,7 @@ class VideoNews:
                                     , content TEXT NULL
                                 );'''
         self.cur.execute(self.create_sql)
+        self.web = '<!DOCTYPE HTML><html><head><title></title></head><body> </body></html>'
 
 
     def get_baidu_soup(self,keyword,page=0):
@@ -98,142 +100,203 @@ class VideoNews:
 
 
     def get_html(self,link):
-        res = requests.get(link,headers={'User-Agent':self.headers['User-Agent']})
-        if ' charset="' in res.text: #space
-            pattern = re.compile('charset="(.*?)"',re.S)
-            res.encoding = re.findall(pattern,res.text)[0]
-        elif ('charset=utf-8' or 'charset=UTF-8') in res.text:
-            res.encoding = 'utf-8'
-        elif ('charset=gb2312' or 'charset=GB2312') in res.text:
-            res.encoding = 'gb2312'
-        elif ((('charset=GBK' or 'charset=gbk') in res.text) or (res.encoding=='ISO-8859-1')):
-            res.encoding = 'GBK'
-        elif 'charset=cp936' in res.text:
-            res.encoding = 'cp936'
-        else:
-            res.encoding = res.encoding
-        #print(res.encoding)
-        return res.text
+        try:
+            time.sleep(0.7)
+            UA = ['Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50']
+            UA.append(self.headers['User-Agent'])
+            res = requests.get(link,headers={'User-Agent':random.choice(UA)})
+            if ' charset="' in res.text: #space
+                pattern = re.compile('charset="(.*?)"',re.S)
+                res.encoding = re.findall(pattern,res.text)[0]
+            elif res.encoding == 'ISO-8859-1':
+                res.encoding = 'GBK'
+            elif (('charset=utf-8' in res.text) or ('charset=UTF-8' in res.text)):
+                res.encoding = 'utf-8'
+            elif (('charset=gb2312' in res.text) or ('charset=GB2312' in res.text)):
+                res.encoding = 'gb2312'
+            elif (('charset=GBK' in res.text) or ('charset=gbk' in res.text)):
+                res.encoding = 'GBK'
+            elif (('charset=cp936' in res.text) or ('charset=CP936' in res.text)):
+                res.encoding = 'cp936'
+            else:
+                res.encoding = res.encoding
+                #print(res.encoding)
+            return res.text
+        except:
+            print('Error link: '+link)
+            return self.web
 
 
     def get_content(self,html):
         soup = BeautifulSoup(html, 'lxml')
-
-        if ('id="main_content"' and 'ifengimg.com/ifeng/') in html:
-            print('--ifeng--')
-            contents = soup.find_all('div',{'id':'main_content'}) #凤凰网
-            return contents[0].get_text()
-
-        elif ('articleInfo: {' and 'www.toutiao.com/complain/') in html: #头条
-            print('--toutiao--')
-            pattern = re.compile("content: '(.*?)'")
-            contents = re.findall(pattern,html)[0]
-            normal_text = BeautifulSoup(unescape(contents),'lxml')
-            return normal_text.get_text()
-
-        elif ('id = "Cnt-Main-Article-QQ"' and 'http://www.qq.com/map/') in html:
-            print('--tencent--')
-            contents = soup.find_all('div',{'id':'Cnt-Main-Article-QQ'}) #腾讯新闻(无vlike)
-            return contents[0].get_text()
-
-        elif ('id="js_content"' and 'res.wx.qq.com/mmbizwap/zh_CN') in html:
-            print('--weixin--')
-            contents = soup.find_all('div',{'id':'js_content'}) #微信公众号
-            return contents[0].get_text()
-
-        elif ('id="artibody"' and 'http://corp.sina.com.cn/chn/sina_job.html') in html:
-            print('--sina--')
-            try:
-                contents = soup.find_all('div',{"id":"artibody"}) #新浪
-                return contents[0].get_text()
-            except:
-                contents = soup.find_all('div',{'id':'articleContent'}) #新浪汽车
-                para = contents[0].get_text()
-                para1 = para.split(';padding:0;margin:0;}')[1]
-                para2 = para1.split('文章关键词：')[0]
-                return para2
-
-
-        elif ('class="article"' and 'sohu.com/tag/') in html:
-            print('--sohu--')
-            contents = soup.find_all('article',{'class':'article'}) #搜狐
-            return contents[0].get_text()
-
-        elif ('class="content"' and 'http://static.bjnews.com.cn/www/') in html:
-            print('--bjnews--')
-            contents = soup.find_all('div',{'class':'content'}) #新京报
-            return contents[0].get_text()
-
-        elif ('id=bd_article' and 'http://kc.look.360.cn')in html:
-            print('--qihoo--')
-            contents = soup.find_all('article') # 今日爆点(360)
-            return contents[0].get_text()
-
-        elif ('id="endText"' and 'http://help.163.com/') in html:
-            print('--163NetEase--')
-            contents = soup.find_all('div',{'id':'endText'}) #网易
-            return contents[0].get_text()
-
-        elif ('id="content-text"' and 'www.btime.com/aboutus.html') in html:
-            print('--btime--')
-            contents = soup.find_all('div',{'id':'content-text'}) #北京时间
-            return contents[0].get_text()[:-40]
-
-        elif ('class="content"' and 'kf@xiaohulu.com') in html:
-            print('--xiaohulu--')
-            para = ''
-            contents = soup.find_all('div',{'class':'content'}) #小葫芦
-            for content in contents[0].find_all('p'):
-                para += content.get_text()
-            return para
-
-        elif ('class="content-bd"' and 'tousu@yidian-inc.com') in html:
-            print('--yidianzixun--')
-            contents = soup.find_all('div',{'class':'content-bd'}) #一点资讯
-            return contents[0].get_text()
-
-        elif ('id="article_content' and 'static.huxiucdn.com/www/') in html:
-            print('--huxiu--')
-            contents = soup.find_all('div',{'class':'article-content-wrap'}) #虎嗅网
-            return contents[0].get_text()
-
-        elif ('class="article-content"' and 'contact@geekpark.net') in html:
-            print('--geekpark--')
-            contents = soup.find_all('div',{'class':'article-content'}) #极客公园
-            return contents[0].get_text()
-
-        elif ('class="article-cont"' and 'news.zol.com.cn/more') in html:
-            print('--ZOL--')
-            contents =soup.find_all('div',{'class':'article-cont'}) #中关村在线
-            return contents[0].get_text()[:-200].replace('\xa0','')
-
-        elif ('id="contentMain"' and 'http://en.gmw.cn/') in html:
-            print('--gmw--')
-            contents = soup.find_all('div',{'id':'contentMain'}) #光明网
-            return contents[0].get_text()
-
-        elif ('class="news-con"' and 'http://www.dzwww.com/map/') in html:
-            print('--dzwww--')
-            contents = soup.find_all('div',{'class':'news-con'}) #大众网
-            return contents[0].get_text()
-
-        elif (('id="content"' and 'http://m.itbear.com.cn') or ('id="content"' and 'http://www.newsgd.com/')) in html:
-            print('--southcn or ITBEAR--')
-            contents = soup.find_all('div',{'id':'content'}) #南方网、ITBEAR
-            return contents[0].get_text()
-        else:
-            try:
+        try:
+            if ('id="main_content"' and 'ifengimg.com/ifeng/') in html:
+                print('--ifeng--')
+                contents = soup.find_all('div',{'id':'main_content'}) #凤凰网
                 para = ''
-                contents = soup.find_all('p')  ###
-                print('瑞士军刀！')
-                for content in contents: ## avoid of navigate bar.
+                for content in contents[0].find_all('p'):
                     para += content.get_text()
-                if len(para)<500:
-                    return ''
                 return para
-            except:
-                print('--Unknown--')
-                return ''
+
+            elif ('articleInfo: {' and 'www.toutiao.com/complain/') in html: #头条
+                print('--toutiao--')
+                pattern = re.compile("content: '(.*?)'")
+                contents = re.findall(pattern,html)[0]
+                normal_text = BeautifulSoup(unescape(contents),'lxml')
+                return normal_text.get_text()
+
+            elif ('id = "Cnt-Main-Article-QQ"' and 'http://www.qq.com/map/') in html:
+                print('--tencent--')
+                contents = soup.find_all('div',{'id':'Cnt-Main-Article-QQ'}) #腾讯新闻(无vlike)
+                para = ''
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+
+            elif ('id="js_content"' and 'res.wx.qq.com/mmbizwap/zh_CN') in html:
+                print('--weixin--')
+                contents = soup.find_all('div',{'id':'js_content'}) #微信公众号
+                return contents[0].get_text()
+
+            elif ('id="artibody"' and 'http://corp.sina.com.cn/chn/sina_job.html') in html:
+                print('--sina--')
+                try:
+                    contents = soup.find_all('div',{"id":"artibody"}) #新浪
+                    para = contents[0].get_text()
+                    if (('script' in para) or ('var' in para) or ('function' in para) or len(para)<500):
+                        return ''
+                    return para
+                except:
+                    contents = soup.find_all('div',{'id':'articleContent'}) #新浪汽车
+                    para = contents[0].get_text().replace('$','')
+                    para1 = para.split(';padding:0;margin:0;}')[1]
+                    para2 = para1.split('文章关键词：')[0]
+                    para3 = para2.split('。文章纠错')[0]
+                    if (('script' in para3) or ('var' in para3) or ('function' in para3)):
+                        return ''
+                    return para3
+
+            elif ('class="article"' and 'sohu.com/tag/') in html:
+                print('--sohu--')
+                contents = soup.find_all('article',{'class':'article'}) #搜狐
+                para = ''
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+
+            elif ('class="content"' and 'http://static.bjnews.com.cn/www/') in html:
+                print('--bjnews--')
+                contents = soup.find_all('div',{'class':'content'}) #新京报
+                para = ''
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+
+            elif ('id=bd_article' and 'http://kc.look.360.cn')in html:
+                print('--qihoo--')
+                contents = soup.find_all('article') # 今日爆点(360)
+                para = ''
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+
+            elif ('id="endText"' and 'http://help.163.com/') in html:
+                print('--163NetEase--')
+                contents = soup.find_all('div',{'id':'endText'}) #网易
+                para = ''
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+
+            elif ('id="content-text"' and 'www.btime.com/aboutus.html') in html:
+                print('--btime--')
+                contents = soup.find_all('div',{'id':'content-text'}) #北京时间
+                #return contents[0].get_text()[:-40]
+                para = ''
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+
+            elif ('class="content"' and 'kf@xiaohulu.com') in html:
+                print('--xiaohulu--')
+                para = ''
+                contents = soup.find_all('div',{'class':'content'}) #小葫芦
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+
+            elif ('class="content-bd"' and 'tousu@yidian-inc.com') in html:
+                print('--yidianzixun--')
+                contents = soup.find_all('div',{'class':'content-bd'}) #一点资讯
+                return contents[0].get_text()
+
+            elif ('id="article_content' and 'static.huxiucdn.com/www/') in html:
+                print('--huxiu--')
+                contents = soup.find_all('div',{'class':'article-content-wrap'}) #虎嗅网
+                return contents[0].get_text()
+
+            elif ('class="article-content"' and 'contact@geekpark.net') in html:
+                print('--geekpark--')
+                contents = soup.find_all('div',{'class':'article-content'}) #极客公园
+                return contents[0].get_text()
+
+            elif ('class="article-cont"' and 'news.zol.com.cn/more') in html:
+                print('--ZOL--')
+                contents =soup.find_all('div',{'class':'article-cont'}) #中关村在线
+                #return contents[0].get_text()[:-200].replace('\xa0','')
+                para = ''
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+
+            elif ('id="contentMain"' and 'http://en.gmw.cn/') in html:
+                print('--gmw--')
+                contents = soup.find_all('div',{'id':'contentMain'}) #光明网
+                para = ''
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+
+            elif ('class="news-con"' and 'http://www.dzwww.com/map/') in html:
+                print('--dzwww--')
+                contents = soup.find_all('div',{'class':'news-con'}) #大众网
+                para = ''
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+
+            elif (('id="content"' and 'http://m.itbear.com.cn') or ('id="content"' and 'http://www.newsgd.com/')) in html:
+                print('--southcn or ITBEAR--')
+                contents = soup.find_all('div',{'id':'content'}) #南方网、ITBEAR
+                para = ''
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+
+            elif ('id="container"') in html:
+                print('--TRS_editor--')
+                contents = soup.find_all('div',{'id':'container'}) #青年网
+                para = ''
+                for content in contents[0].find_all('p'):
+                    para += content.get_text()
+                return para
+            else:
+                try:
+                    para = ''
+                    contents = soup.find_all('p')  ###
+                    print('--瑞士军刀--')
+                    for content in contents: ## avoid of navigate bar.
+                        para += content.get_text()
+                    para = para.replace('$','').split('文章纠错')[0]
+                    if (('script' in para) or ('var' in para) or ('function' in para) or len(para)<500):
+                        return ''
+                    return para
+                except:
+                    print('--Unknown--')
+                    return ''
+        except:
+            print('--parse error--')
+            return ''
 
 
     def gene_data(self,keyword,page):
@@ -269,7 +332,7 @@ class VideoNews:
 
     def save_data(self,dt):
         save_sql =  '''
-                    INSERT INTO qxiu_bi2.xyl__VideoNews 
+                    INSERT INTO qxiu_bi2.xyl__VideoNews_v1 
                         (title,crawlTime,keyword,length,publish,pubDate,word_TF,word_RANK,emotion,image,video,link,content) 
                     VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}');
                     '''.format(
@@ -300,16 +363,28 @@ class VideoNews:
 
 
 if __name__ == '__main__':
+    items = ['直播行业','小视频','短视频','网红 直播','小米直播','人人直播','陌陌','映客','花椒直播','奇秀直播','一直播','NOW直播',
+             '六间房直播','来疯','千帆直播','我秀直播','繁星直播','网易cc直播','网易BoBo直播','网易薄荷直播','全民直播','花样直播',
+             'YY直播','live直播','vlive直播','KK直播','梦想直播','聚星直播','新浪秀场',
+             '美拍','快手','火山小视频','抖音','淘宝直播','梨视频','开眼视频','秒拍','映兔视频','V电影','魔力盒',
+             '快视频','西瓜视频',
+             '熊猫直播','斗鱼直播','虎牙直播','企鹅直播','企鹅电竞','熊猫直播','战旗直播','狮吼直播','触手直播','龙珠直播']
+            #抱抱直播、嗨秀秀场、乐嗨秀场、么么直播、bilibili直播、九秀直播、
+
     news = VideoNews()
-    data = news.gene_data('video',0)
     try:
-        for dt in data:
-            print(dt)
-            ppt(news.save_data(dt))
+        for item in items:
+            print(item*10)
+            data = news.gene_data(item,0)
+            for dt in data:
+                print(dt)
+                ppt(news.save_data(dt))
     finally:
         news.save_end()
 
-
+    #恢复<p>标签
+    #加入encoding
+    #怎么 好用吗
 
     # link1 = 'http://e.gmw.cn/2017-11/16/content_26806647.htm' #光明网
     # link2 = 'http://tech.ifeng.com/a/20171115/44761603_0.shtml' #凤凰网
