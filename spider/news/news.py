@@ -213,7 +213,7 @@ class News:
                 'length': dic['length'][i],
                 'content': dic['content'][i],
                 'parser': dic['parser'][i],
-                'encoding': dic['encoding']
+                'encoding': dic['encoding'][i]
             }
             yield data
 
