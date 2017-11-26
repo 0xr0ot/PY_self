@@ -1,11 +1,3 @@
-# coding:utf-8
-
-import re
-import requests
-from html import unescape
-from bs4 import BeautifulSoup
-from pprint import pprint as ppt
-
 PARSE_POOL = {
     'id="main_content"': {'who':'ifeng','only':'http://www.ifeng.com/corp/feedback/'},
     'id="Cnt-Main-Article-QQ"': {'who':'tencent_cnt','only':'http://www.qq.com/map/'},
