@@ -14,7 +14,7 @@ from pprint import pprint as ppt
 from .config import *
 
 
-class VideoNews:
+class News:
     def __init__(self):
         self.host = 'http://news.baidu.com/ns?'
         self.tm = time.time()
@@ -256,7 +256,7 @@ if __name__ == '__main__':
              '熊猫直播', '斗鱼直播', '虎牙直播', '企鹅直播', '企鹅电竞', '熊猫直播', '战旗直播', '狮吼直播', '触手直播', '龙珠直播']
     # 抱抱直播、嗨秀秀场、乐嗨秀场、么么直播、bilibili直播、九秀直播、
 
-    news = VideoNews()
+    news = News()
     try:
         for item in items:
             print(item * 10)
