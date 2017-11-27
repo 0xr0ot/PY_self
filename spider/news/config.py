@@ -1,7 +1,7 @@
 PARSE_POOL = {
     'id="main_content"': {'who':'ifeng','only':'http://www.ifeng.com/corp/feedback/'},
     'id="Cnt-Main-Article-QQ"': {'who':'tencent_cnt','only':'http://www.qq.com/map/'},
-    'id="js_content"': {'who':'weixin','only':'res.wx.qq.com/mmbizwap/zh_CN'},
+    'id="js_content"': {'who':'weixin','only':'res.wx.qq.com/'},
     'id="articleContent"': {'who':'sina_auto','only':'http://corp.sina.com.cn/chn/sina_job.html'},
     'id="endText"': {'who':'netease','only':'http://help.163.com/'},
     'id="content-text"': {'who':'btime','only':'www.btime.com/aboutus.html'},
@@ -9,7 +9,7 @@ PARSE_POOL = {
     'class="article-content-wrap"': {'who':'huxiu','only':'static.huxiucdn.com/www/'},
     'class="article-content"': {'who':'geekpark','only':'contact@geekpark.net'},
     'id="contentMain"': {'who':'gmw','only':'http://en.gmw.cn/'},
-    'class="news-con"': {'who':'dzwww','only':'http://www.dzwww.com/map/'},
+    'id="news-con"': {'who':'dzwww','only':'http://www.dzwww.com/map/'},
     'class="page_text"': {'who':'youth','only':'http://news.youth.cn/gn/'},
     'id="ctrlfscont"': {'who':'cankaoxiaoxi','only':'http://www.cankaoxiaoxi.com/about/'},
     'id="p-detail"': {'who':'xinhuanet','only':'http://203.192.6.89/xhs/'},
