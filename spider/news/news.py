@@ -3,6 +3,7 @@
 
 import re
 import time
+import datetime
 import random
 import pymysql
 import requests
@@ -11,7 +12,7 @@ from html import unescape
 from bs4 import BeautifulSoup
 from urllib.parse import urlencode
 from pprint import pprint as ppt
-from .config import *
+from config import *
 
 
 class News:
@@ -42,12 +43,12 @@ class News:
                                     port=33066,
                                     user='xxxx',
                                     password='xxxx',
-                                    database='qxiu_bi2',
+                                    database='xxxx',
                                     charset='utf8mb4',
                                     cursorclass=pymysql.cursors.DictCursor)
         self.cur = self.conn.cursor()
         self.create_sql = '''
-                            CREATE TABLE IF NOT EXISTS xxx.xyl__VideoNews_v2
+                            CREATE TABLE IF NOT EXISTS xxxx.xyl__VideoNews_v3
                                 (
                                       title VARCHAR(64) NOT NULL PRIMARY KEY
                                     , crawlTime INT(10) NOT NULL
@@ -65,6 +66,19 @@ class News:
                                 );'''
         self.cur.execute(self.create_sql)
         self.web = '<!DOCTYPE HTML><html><head><title></title></head><body> </body></html>'
+
+    def transTime(self,tm):
+        pool = {'日': 0, '小时': 3600, '分钟': 60, '秒': 1}
+        for X in pool.keys():
+            if ((X in tm) and (X != '日')):
+                patt = re.compile('(.*?)' + X)
+                num = int(re.findall(patt, tm)[0])
+                stmp = int(time.time()) - num * pool[X]
+                see_time = datetime.datetime.fromtimestamp(stmp).strftime("%Y-%m-%d %H:%M:%S")
+                return see_time+':00'
+            if ((X in tm) and (X == '日')):
+                see_time = tm.replace('年', '-').replace('月', '-').replace(X, '')
+                return see_time
 
     def get_baidu(self, keyword, page=0):
         if page == 0:
@@ -89,13 +103,13 @@ class News:
         item = soup.find_all('div', {'class': 'c-title-author'})
         org_publish, org_date = [], []
         for it in item:
-            org = it.get_text().split('\xa0\xa0')  # space
+            org = it.get_text().split('\xa0\xa0') # space
             org_publish.append(org[0])
-            org_date.append(org[1])
+            org_date.append(self.transTime(org[1]))
         dic = {'publish': org_publish, 'pubDate': org_date,'title': tt_pool, 'link': lk_pool}
         return dic
 
-    def judge(self,only, html):
+    def judgeOnly(self,only, html):
         if isinstance(only, list):
             for x in only:
                 if x in html:
@@ -137,7 +151,7 @@ class News:
         soup = BeautifulSoup(html, 'lxml')
 
         for parser in PARSE_POOL.keys():
-            if (parser == 'articleInfo: {' and self.judge(PARSE_POOL[parser]['only'], html)):
+            if (parser == 'articleInfo: {' and self.judgeOnly(PARSE_POOL[parser]['only'], html)):
                 pattern = re.compile("content: '(.*?)'")
                 contents = re.findall(pattern, html)[0]
                 para = BeautifulSoup(unescape(contents), 'lxml').get_text()
@@ -149,7 +163,7 @@ class News:
                 }
                 return dic
 
-            elif (parser == 'article') and (parser in html) and self.judge(PARSE_POOL[parser]['only'], html):
+            elif (parser == 'article') and (parser in html) and self.judgeOnly(PARSE_POOL[parser]['only'], html):
                 contents = soup.find_all('article')
                 para = contents[0].get_text()
                 dic = {
@@ -160,7 +174,7 @@ class News:
                 }
                 return dic
 
-            elif (parser in html) and (parser != 'article') and (parser != 'articleInfo: {') and self.judge(PARSE_POOL[parser]['only'], html):
+            elif (parser in html) and (parser != 'article') and (parser != 'articleInfo: {') and self.judgeOnly(PARSE_POOL[parser]['only'], html):
                 try:
                     kk, vv = parser.split('=')[0], parser.split('=')[1][1:-1]
                     if ' ' in vv:
@@ -194,23 +208,40 @@ class News:
         }
         return dic
 
+    def nlp_word(self, content):
+        def ext(sentence, method='TF-IDF'):
+            if method == 'TF-IDF':
+                result = jieba.analyse.extract_tags(sentence, topK=10, allowPOS=('ns', 'n', 'vn', 'v'))
+                return ','.join(result)
+            if method == 'TextRank':
+                result = jieba.analyse.textrank(sentence, topK=10, allowPOS=('ns', 'n', 'vn', 'v'))
+                return ','.join(result)
+
+        pool = []
+        for method in ['TF-IDF', 'TextRank']:
+            pool.append(ext(content, method=method))
+        return pool
+
 
     def gene_data(self, keyword, page):
         dic = self.get_baidu(keyword, page)
         con_pool, len_pool = [], []
         parse_pool,encode_pool = [],[]
+        word_tf,word_rank = [],[]
         for link in dic['link']:
             print('now: ',link)
             para_dic = self.get_content(link)
             para = para_dic['para'].strip()
+            word_tf.append(self.nlp_word(para)[0])
+            word_rank.append(self.nlp_word(para)[1])
             con_pool.append(para)
             len_pool.append(para_dic['length'])
             parse_pool.append(para_dic['parser'])
             encode_pool.append(para_dic['encoding'])
 
-        cont_dic = {'content': con_pool, 'length': len_pool, 'parser':parse_pool, 'encoding':encode_pool}
+        cont_dic = {'content': con_pool, 'length': len_pool, 'parser':parse_pool, 'encoding':encode_pool,
+                    'word_tf': word_tf, 'word_rank': word_rank}
         dic.update(cont_dic)
-
         for i, j in enumerate(dic['link']):
             data = {
                 'keyword': keyword,
@@ -221,18 +252,20 @@ class News:
                 'length': dic['length'][i],
                 'content': dic['content'][i],
                 'parser': dic['parser'][i],
-                'encoding': dic['encoding'][i]
+                'encoding': dic['encoding'][i],
+                'word_tf' : dic['word_tf'][i],
+                'word_rank': dic['word_rank'][i]
             }
             yield data
 
     def save_data(self, dt):
         save_sql = '''
-                    INSERT INTO xxx.xyl__VideoNews_v2 
+                    INSERT INTO xxxx.xyl__VideoNews_v3 
                         (title,crawlTime,keyword,length,publish,pubDate,word_TF,word_RANK,emotion,image,video,link,content) 
                     VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}');
                     '''.format(
-            dt['title'], int(time.time()), dt['keyword'], dt['length'], dt['publish'], dt['pubDate'], '', '', '', '','',
-            dt['link'], dt['content']
+            dt['title'], int(time.time()), dt['keyword'], dt['length'], dt['publish'], dt['pubDate'], dt['word_tf'],
+            dt['word_rank'], '', '','', dt['link'], dt['content']
         )
         try:
             self.cur.execute(save_sql)
@@ -262,17 +295,9 @@ class News:
             return True
         return False
 
-    # TODO nlp
-    def ext(sentence, method='TF-IDF'):
-        if method == 'TF-IDF':
-            result = jieba.analyse.extract_tags(sentence, topK=10, allowPOS=('ns', 'n', 'vn', 'v'))
-            return result
-        if method == 'TextRank':
-            result = jieba.analyse.textrank(sentence, topK=10, allowPOS=('ns', 'n', 'vn', 'v'))
-            return result
-
 
 if __name__ == '__main__':
+    begin = time.time()
     items = ['直播行业', '小视频', '短视频', '网红 直播', '小米直播', '全民直播', '陌陌', '映客', '花椒直播', '奇秀直播', '一直播',
              'NOW直播','六间房直播', '来疯', '千帆直播', '我秀直播', '繁星直播', '网易cc直播', '网易BoBo直播', '网易薄荷直播',
              '花样直播','YY直播', 'live直播', 'vlive直播', 'KK直播', '梦想直播', '聚星直播', '新浪秀场','豆豆Live','人人直播',
@@ -280,7 +305,7 @@ if __name__ == '__main__':
              '快视频', '西瓜视频',
              '熊猫直播', '斗鱼直播', '虎牙直播', '企鹅直播', '企鹅电竞', '熊猫直播', '战旗直播', '狮吼直播', '触手直播', '龙珠直播']
     # 抱抱直播、嗨秀秀场、乐嗨秀场、么么直播、bilibili直播、九秀直播、
-
+    # items = ['今日头条','360','小米']
     news = News()
     try:
         for item in items:
@@ -292,3 +317,4 @@ if __name__ == '__main__':
                     news.save_data(dt)
     finally:
         news.save_end()
+    print("useTime: ",time.time()-begin)
