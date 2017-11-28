@@ -39,16 +39,16 @@ class News:
                       'BD_CK_SAM=1; PSINO=1; BDSVRTM=143; H_PS_PSSID='.format(self.tm1 - 82207, self.tm1 - 81353,
                                                                               self.tm1 - 798, self.tm1 - 798, self.tm0)
         }
-        self.conn = pymysql.connect(host='xxxx',
+        self.conn = pymysql.connect(host='123.59.20.50',
                                     port=33066,
-                                    user='xxxx',
-                                    password='xxxx',
-                                    database='xxxx',
+                                    user='qxiu_user',
+                                    password='c9Lmb6Wu29RGX!c',
+                                    database='qxiu_bi2',
                                     charset='utf8mb4',
                                     cursorclass=pymysql.cursors.DictCursor)
         self.cur = self.conn.cursor()
         self.create_sql = '''
-                            CREATE TABLE IF NOT EXISTS xxxx.xyl__VideoNews_v3
+                            CREATE TABLE IF NOT EXISTS qxiu_bi2.xyl__VideoNews_v3
                                 (
                                       title VARCHAR(64) NOT NULL PRIMARY KEY
                                     , crawlTime INT(10) NOT NULL
@@ -89,6 +89,7 @@ class News:
             pageN = 20 * page
             param = {'ct': 0, 'rn': 20, 'ie': 'utf-8', 'cl': 2, 'tn': 'newstitle', 'word': 'intitle:(' + keyword + ')',
                      'bt': 0, 'et': 0, 'pn': pageN}
+        self.headers.update({'User-Agent': random.choice(UA_POOL)})
         res = requests.get(self.host, params=urlencode(param), headers=self.headers)
         soup = BeautifulSoup(res.text, 'lxml')
 
@@ -136,14 +137,9 @@ class News:
                 return 'utf-8'
 
     def get_content(self, link):
-        time.sleep(0.7)
-        UA = ['Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50',
-              'Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11',
-              'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.9 Safari/536.5']
-        UA.append(self.headers['User-Agent'])
         try:
             global res
-            res = requests.get(link, headers={'User-Agent': random.choice(UA)})
+            res = requests.get(link, headers={'User-Agent': random.choice(UA_POOL)})
             res.encoding = self.encode_bug(res)
             html = res.text
         except:
@@ -260,7 +256,7 @@ class News:
 
     def save_data(self, dt):
         save_sql = '''
-                    INSERT INTO xxxx.xyl__VideoNews_v3 
+                    INSERT INTO qxiu_bi2.xyl__VideoNews_v3 
                         (title,crawlTime,keyword,length,publish,pubDate,word_TF,word_RANK,emotion,image,video,link,content) 
                     VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}');
                     '''.format(
