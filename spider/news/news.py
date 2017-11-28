@@ -196,12 +196,7 @@ class News:
                     return dic
                 except:
                     print('id-class parser error.')
-        dic = {
-            'parser': 'Unknown',
-            'encoding': res.encoding,
-            'para': '',
-            'length': 0
-        }
+        dic = {'parser': 'Unknown','encoding': res.encoding,'para': '','length': 0}
         return dic
 
     def nlp_word(self, content):
@@ -282,13 +277,10 @@ class News:
         no_cont = ['http://','var','function']
         limit = 200
         for nokey1 in no_title:
-            if nokey1 in dt['title']:
-                return True
+            if nokey1 in dt['title']: return True
         for nokey2 in no_cont:
-            if nokey2 in dt['content']:
-                return True
-        if dt['length']<limit:
-            return True
+            if nokey2 in dt['content']: return True
+        if dt['length']<limit: return True
         return False
 
 
@@ -297,11 +289,14 @@ if __name__ == '__main__':
     items = ['直播行业', '小视频', '短视频', '网红 直播', '小米直播', '全民直播', '陌陌', '映客', '花椒直播', '奇秀直播', '一直播',
              'NOW直播','六间房直播', '来疯', '千帆直播', '我秀直播', '繁星直播', '网易cc直播', '网易BoBo直播', '网易薄荷直播',
              '花样直播','YY直播', 'live直播', 'vlive直播', 'KK直播', '梦想直播', '聚星直播', '新浪秀场','豆豆Live','人人直播',
+             '百秀直播','暖暖直播','齐齐直播','抱抱直播','bilibili直播','BIGO LIVE',
              '美拍', '快手', '火山小视频', '抖音', '淘宝直播', '梨视频', '开眼视频', '秒拍', '映兔视频', 'V电影','魔力盒',
-             '快视频', '西瓜视频',
+             '快视频', '西瓜视频','章鱼TV',
              '熊猫直播', '斗鱼直播', '虎牙直播', '企鹅直播', '企鹅电竞', '熊猫直播', '战旗直播', '狮吼直播', '触手直播', '龙珠直播']
-    # 抱抱直播、嗨秀秀场、乐嗨秀场、么么直播、bilibili直播、九秀直播、
+    # 、嗨秀秀场、乐嗨秀场、么么直播、、九秀直播、
     # items = ['今日头条','360','小米']
+    
+    # 索引页无结果 考虑
     news = News()
     N = 0
     try:
