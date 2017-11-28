@@ -39,16 +39,16 @@ class News:
                       'BD_CK_SAM=1; PSINO=1; BDSVRTM=143; H_PS_PSSID='.format(self.tm1 - 82207, self.tm1 - 81353,
                                                                               self.tm1 - 798, self.tm1 - 798, self.tm0)
         }
-        self.conn = pymysql.connect(host='123.59.20.50',
+        self.conn = pymysql.connect(host='xxxx',
                                     port=33066,
-                                    user='qxiu_user',
-                                    password='c9Lmb6Wu29RGX!c',
-                                    database='qxiu_bi2',
+                                    user='xxxx',
+                                    password='xxxx',
+                                    database='xxxx',
                                     charset='utf8mb4',
                                     cursorclass=pymysql.cursors.DictCursor)
         self.cur = self.conn.cursor()
         self.create_sql = '''
-                            CREATE TABLE IF NOT EXISTS qxiu_bi2.xyl__VideoNews_v3
+                            CREATE TABLE IF NOT EXISTS xxxx.xyl__VideoNews_v3
                                 (
                                       title VARCHAR(64) NOT NULL PRIMARY KEY
                                     , crawlTime INT(10) NOT NULL
@@ -256,7 +256,7 @@ class News:
 
     def save_data(self, dt):
         save_sql = '''
-                    INSERT INTO qxiu_bi2.xyl__VideoNews_v3 
+                    INSERT INTO xxxx.xyl__VideoNews_v3 
                         (title,crawlTime,keyword,length,publish,pubDate,word_TF,word_RANK,emotion,image,video,link,content) 
                     VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}');
                     '''.format(
