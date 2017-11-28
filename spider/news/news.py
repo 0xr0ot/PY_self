@@ -113,11 +113,9 @@ class News:
     def judgeOnly(self,only, html):
         if isinstance(only, list):
             for x in only:
-                if x in html:
-                    return True
+                if x in html: return True
             return False
-        if only in html:
-            return True
+        if only in html: return True
 
     def encode_bug(self,res):
         if ((res.encoding == 'ISO-8859-1') or (res.encoding is None) or ('charset=gb2312' in res.text) or ('charset=GB2312' in res.text)):
