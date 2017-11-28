@@ -42,7 +42,7 @@ class News:
         self.conn = pymysql.connect(host='xxxx',
                                     port=33066,
                                     user='xxxx',
-                                    password='xxxx',
+                                    password='xxxxx',
                                     database='xxxx',
                                     charset='utf8mb4',
                                     cursorclass=pymysql.cursors.DictCursor)
@@ -75,10 +75,10 @@ class News:
                 num = int(re.findall(patt, tm)[0])
                 stmp = int(time.time()) - num * pool[X]
                 see_time = datetime.datetime.fromtimestamp(stmp).strftime("%Y-%m-%d %H:%M:%S")
-                return see_time+':00'
+                return see_time
             if ((X in tm) and (X == '日')):
                 see_time = tm.replace('年', '-').replace('月', '-').replace(X, '')
-                return see_time
+                return see_time+':00'
 
     def get_baidu(self, keyword, page=0):
         if page == 0:
@@ -113,9 +113,11 @@ class News:
     def judgeOnly(self,only, html):
         if isinstance(only, list):
             for x in only:
-                if x in html: return True
+                if x in html:
+                    return True
             return False
-        if only in html: return True
+        if only in html:
+            return True
 
     def encode_bug(self,res):
         if ((res.encoding == 'ISO-8859-1') or (res.encoding is None) or ('charset=gb2312' in res.text) or ('charset=GB2312' in res.text)):
@@ -301,6 +303,7 @@ if __name__ == '__main__':
     # 抱抱直播、嗨秀秀场、乐嗨秀场、么么直播、bilibili直播、九秀直播、
     # items = ['今日头条','360','小米']
     news = News()
+    N = 0
     try:
         for item in items:
             print(item * 10)
@@ -309,6 +312,8 @@ if __name__ == '__main__':
                 ppt(dt)
                 if not news.filter(dt):
                     news.save_data(dt)
+                    N += 1
     finally:
         news.save_end()
-    print("useTime: ",time.time()-begin)
+        print('saveNumber about: ', N)
+        print("useTime: ", time.time()-begin)
