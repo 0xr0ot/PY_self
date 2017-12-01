@@ -39,9 +39,9 @@ class News:
                       'BD_CK_SAM=1; PSINO=1; BDSVRTM=143; H_PS_PSSID='.format(self.tm1 - 82207, self.tm1 - 81353,
                                                                               self.tm1 - 798, self.tm1 - 798, self.tm0)
         }
-        self.conn = pymysql.connect(host='xxx',
+        self.conn = pymysql.connect(host='xxxx',
                                     port=33066,
-                                    user='xxx',
+                                    user='qxiu_user',
                                     password='xxxx',
                                     database='xxxx',
                                     charset='utf8mb4',
@@ -53,6 +53,7 @@ class News:
                                       title VARCHAR(64) NOT NULL PRIMARY KEY
                                     , crawlTime INT(10) NOT NULL
                                     , keyword VARCHAR(16) NOT NULL
+                                    , field VARCHAR(16) NOT NULL 
                                     , length INT(8) NOT NULL
                                     , publish VARCHAR(32) NOT NULL
                                     , pubDate VARCHAR(32) NOT NULL
@@ -98,7 +99,7 @@ class News:
         data = soup.find_all('h3', {'class': 'c-title'})
         tt_pool, lk_pool = [], []
         for dt in data:
-            tt_pool.append(dt.find_all('a')[0].get_text())
+            tt_pool.append(dt.find_all('a')[0].get_text().strip())
             lk_pool.append(dt.find_all('a')[0].attrs['href'])
 
         # get `publish`,`pubDate`.
@@ -213,101 +214,102 @@ class News:
             pool.append(ext(content, method=method))
         return pool
 
-    def gene_data(self, keyword, page):
-        dic = self.get_baidu(keyword, page)
-        con_pool, len_pool = [], []
-        parse_pool, encode_pool = [], []
-        word_tf, word_rank = [], []
-        for link in dic['link']:
-            print('Doing: ', link)
-            para_dic = self.get_content(link)
-            para = para_dic['para'].strip()
-            word_tf.append(self.nlp_word(para)[0])
-            word_rank.append(self.nlp_word(para)[1])
-            con_pool.append(para)
-            len_pool.append(para_dic['length'])
-            parse_pool.append(para_dic['parser'])
-            encode_pool.append(para_dic['encoding'])
+    # ITEM_POOL
+    def gen_it(self,items):
+        for item in items.keys():
+            for keyword in items[item]:
+                yield (item, keyword)
 
-        cont_dic = {'content': con_pool, 'length': len_pool, 'parser': parse_pool, 'encoding': encode_pool,
-                    'word_tf': word_tf, 'word_rank': word_rank}
-        dic.update(cont_dic)
-        for i, j in enumerate(dic['link']):
-            yield {
-                'keyword': keyword,
-                'title': dic['title'][i],
-                'link': dic['link'][i],
-                'pubDate': dic['pubDate'][i],
-                'publish': dic['publish'][i],
-                'length': dic['length'][i],
-                'content': dic['content'][i],
-                'parser': dic['parser'][i],
-                'encoding': dic['encoding'][i],
-                'word_tf': dic['word_tf'][i],
-                'word_rank': dic['word_rank'][i]
-            }
+
+    def gene_data(self, ITEM_POOL, page):
+        for it in self.gen_it(ITEM_POOL):
+            field,keyword = it
+
+            dic = self.get_baidu(keyword, page)
+            con_pool, len_pool = [], []
+            parse_pool, encode_pool = [], []
+            word_tf, word_rank = [], []
+            for link in dic['link']:
+                print('Doing: ', link)
+                para_dic = self.get_content(link)
+                para = para_dic['para'].strip()
+                word_tf.append(self.nlp_word(para)[0])
+                word_rank.append(self.nlp_word(para)[1])
+                con_pool.append(para)
+                len_pool.append(para_dic['length'])
+                parse_pool.append(para_dic['parser'])
+                encode_pool.append(para_dic['encoding'])
+
+            cont_dic = {'content': con_pool, 'length': len_pool, 'parser': parse_pool, 'encoding': encode_pool,
+                        'word_tf': word_tf, 'word_rank': word_rank}
+            dic.update(cont_dic)
+            for i, j in enumerate(dic['link']):
+                yield {
+                    'field': field,
+                    'keyword': keyword,
+                    'title': dic['title'][i],
+                    'link': dic['link'][i],
+                    'pubDate': dic['pubDate'][i],
+                    'publish': dic['publish'][i],
+                    'length': dic['length'][i],
+                    'content': dic['content'][i],
+                    'parser': dic['parser'][i],
+                    'encoding': dic['encoding'][i],
+                    'word_tf': dic['word_tf'][i],
+                    'word_rank': dic['word_rank'][i]
+                }
 
 
     def save_data(self, dt):
         save_sql = '''
                     INSERT INTO xyl__VideoNews_v3 
-                        (title,crawlTime,keyword,length,publish,pubDate,word_TF,word_RANK,emotion,image,video,link,content) 
-                    VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}');
+                        (title,crawlTime,keyword,field,length,publish,pubDate,word_TF,word_RANK,emotion,image,video,link,content) 
+                    VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}');
                     '''.format(
-                                dt['title'], int(time.time()), dt['keyword'], dt['length'], dt['publish'], dt['pubDate'],
-                                dt['word_tf'], dt['word_rank'], '', '', '', dt['link'], dt['content']
+                                dt['title'], int(time.time()), dt['keyword'], dt['field'],dt['length'], dt['publish'],
+                                dt['pubDate'],dt['word_tf'], dt['word_rank'], '', '', '', dt['link'], dt['content']
         )
         try:
             self.cur.execute(save_sql)
             self.conn.commit()
             print('Save successfully!\r\n')
+            return 1
         except pymysql.IntegrityError as e1:
             print(e1)
+            return 0
         except pymysql.err.ProgrammingError as e2:
             print(e2)
-        return 'Save successfully!\r\n'
+            return 0
+
 
     def save_end(self):
         self.cur.close()
         self.conn.close()
 
-    def filter(self, dt):
-        no_title = ['怎么', '好用吗', '直播：', '视频：','视频直播']
-        no_cont = ['http://', 'var', 'function']
-        limit = 200
+    def filter(self, dt, no_title, no_content, min_length):
         for nokey1 in no_title:
             if nokey1 in dt['title']: return True
-        for nokey2 in no_cont:
+        for nokey2 in no_content:
             if nokey2 in dt['content']: return True
-        if dt['length'] < limit: return True
+        if dt['length'] < min_length: return True
         return False
 
 
-if __name__ == '__main__':
+def run(ITEM_POOL,page):
     begin = time.time()
-    items = ['直播行业', '小视频', '短视频', '网红 直播', '小米直播', '全民直播', '陌陌', '映客', '花椒直播', '奇秀直播', '一直播',
-             'NOW直播', '六间房直播', '来疯', '千帆直播', '我秀直播', '繁星直播', '网易cc直播', '网易BoBo直播', '网易薄荷直播',
-             '花样直播', 'YY直播', 'live直播', 'vlive直播', 'KK直播', '梦想直播', '聚星直播', '新浪秀场', '豆豆Live', '人人直播',
-             '百秀直播', '暖暖直播', '齐齐直播', '聚范直播', '抱抱直播', 'bilibili直播', 'BIGO LIVE','嗨秀秀场','乐嗨秀场','么么直播',
-             '九秀直播',
-             '美拍', '快手', '火山小视频', '抖音', '淘宝直播', '梨视频', '开眼视频', '秒拍', '映兔视频', 'V电影', '魔力盒视频',
-             '快视频', '西瓜视频', '腾讯微视', '酷燃视频', '好看视频', 'Vshow', '小题影视', '赤椒生活', '即刻视频','Video++',
-             '一条 短视频','二更影视','三感video',
-             '章鱼TV',
-             '熊猫直播', '斗鱼直播', '虎牙直播', '企鹅直播', '企鹅电竞', '熊猫直播', '战旗直播', '狮吼直播', '触手直播', '龙珠直播']
-
     news = News()
-    N = 0
+    saveNum = 0
     try:
-        for item in items:
-            print(item * 10)
-            data = news.gene_data(item, 0)
-            for dt in data:
-                ppt(dt)
-                if not news.filter(dt):
-                    news.save_data(dt)
-                    N += 1
+        data = news.gene_data(ITEM_POOL, page)
+        for dt in data:
+            #ppt(dt)
+            if not news.filter(dt,NO_TITLE,NO_CONTENT,MIN_LENGTH):
+                saveNum += news.save_data(dt)
     finally:
         news.save_end()
-        print('saveNumber about: ', N)
+        print('saveNumber about: ', saveNum)
         print("useTime: ", int(time.time() - begin))
+
+
+if __name__ == '__main__':
+    run(ITEM_POOL,0)
