@@ -41,14 +41,14 @@ class News:
         }
         self.conn = pymysql.connect(host='xxxx',
                                     port=33066,
-                                    user='qxiu_user',
+                                    user='xxxx',
                                     password='xxxx',
                                     database='xxxx',
                                     charset='utf8mb4',
                                     cursorclass=pymysql.cursors.DictCursor)
         self.cur = self.conn.cursor()
         self.create_sql = '''
-                            CREATE TABLE IF NOT EXISTS xyl__VideoNews_v3
+                            CREATE TABLE IF NOT EXISTS xyl__VideoNews_v4
                                 (
                                       title VARCHAR(64) NOT NULL PRIMARY KEY
                                     , crawlTime INT(10) NOT NULL
@@ -120,27 +120,25 @@ class News:
         if only in html: return True
 
     def encode_bug(self, res):
-        if ((res.encoding == 'ISO-8859-1') or (res.encoding is None) or ('charset=gb2312' in res.text) or (
-            'charset=GB2312' in res.text)):
-            if (('charset=gb2312' in res.text) or ('charset=GB2312' in res.text)):  # people.cn
+        if ((res.encoding == 'ISO-8859-1') or (res.encoding is None)):
+            if (('charset=gb2312' in res.text) or ('charset=GB2312' in res.text)):
                 return 'gb2312'
-            elif 'charset="' in res.text:
-                pattern = re.compile('charset="(.*?)"', re.S)
-                res.encoding = re.findall(pattern, res.text)[0]
-                return res.encoding
-            elif (('charset=utf-8' in res.text) or ('charset=UTF-8' in res.text)):
-                return 'utf-8'
             elif (('charset=GBK' in res.text) or ('charset=gbk' in res.text)):
                 return 'GBK'
             elif (('charset=cp936' in res.text) or ('charset=CP936' in res.text)):
                 return 'cp936'
-            else:
+            elif (('charset=utf-8' in res.text) or ('charset=UTF-8' in res.text)):
                 return 'utf-8'
+            elif 'charset="' in res.text:
+                pattern = re.compile('charset="(.*?)"', re.S)
+                res.encoding = re.findall(pattern, res.text)[0]
+                return res.encoding
+        return res.encoding
 
     def get_content(self, link):
         try: #solve zero index in baidu && network error.
             global res
-            res = requests.get(link, headers={'User-Agent': random.choice(UA_POOL)})
+            res = requests.get(link, headers={'User-Agent': random.choice(UA_POOL)},timeout=5)
             res.encoding = self.encode_bug(res)
             html = res.text
         except:
@@ -186,8 +184,7 @@ class News:
                         para = ''
                         for content in contents[0].find_all('p'):
                             para += content.get_text()
-                    para = para.replace('\u3000\u3000', '\n').replace('\xa0', '').replace('\t', '').replace('\r\n',
-                                                                                                            '\n')
+                    para = para.replace('\u3000\u3000', '\n').replace('\xa0', '').replace('\t', '').replace('\r\n','\n')
                     para = para.replace('\n\n', '\n').replace('\n \n', '\n').replace('   ', '').replace('\t\n', '')
                     return {
                         'parser': PARSE_POOL[parser]['who'],
@@ -230,7 +227,7 @@ class News:
             parse_pool, encode_pool = [], []
             word_tf, word_rank = [], []
             for link in dic['link']:
-                print('Doing: ', link)
+                print(keyword,': ', link)
                 para_dic = self.get_content(link)
                 para = para_dic['para'].strip()
                 word_tf.append(self.nlp_word(para)[0])
@@ -262,7 +259,7 @@ class News:
 
     def save_data(self, dt):
         save_sql = '''
-                    INSERT INTO xyl__VideoNews_v3 
+                    INSERT INTO xyl__VideoNews_v4 
                         (title,crawlTime,keyword,field,length,publish,pubDate,word_TF,word_RANK,emotion,image,video,link,content) 
                     VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}','{11}','{12}','{13}');
                     '''.format(
@@ -272,7 +269,7 @@ class News:
         try:
             self.cur.execute(save_sql)
             self.conn.commit()
-            print('Save successfully!\r\n')
+            print('Save successfully!\r\n{}'.format(dt['link']))
             return 1
         except pymysql.IntegrityError as e1:
             print(e1)
@@ -308,7 +305,7 @@ def run(ITEM_POOL,page):
     finally:
         news.save_end()
         print('saveNumber about: ', saveNum)
-        print("useTime: ", int(time.time() - begin))
+        print("useTime: ", int(time.time() - begin), int((time.time() - begin) / 60))
 
 
 if __name__ == '__main__':
