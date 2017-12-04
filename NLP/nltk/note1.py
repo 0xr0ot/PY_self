@@ -33,3 +33,19 @@ f1.plot(50,cumulative=True)
 
 # 只出现一次的词
 r9 = f1.hapaxes()
+
+# 词长度选择(细粒度选择,Fine-Grained)
+V = set(text1)
+r10 = set([w for w in V if len(w) > 15])
+
+# 词长且词频
+f2 = FreqDist(text5)
+r11 = sorted([w for w in set(text5) if len(w) > 7 and f2[w] > 7])
+
+# 双连词,搭配
+text4.collocations()
+
+# 过滤分字母元素
+r12 = len(set([word.lower() for word in text1 if word.isalpha()]))
+
+#TODO
