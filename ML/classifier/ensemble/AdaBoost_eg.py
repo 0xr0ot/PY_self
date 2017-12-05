@@ -1,7 +1,7 @@
 # coding=utf-8
 
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn import datasets, cross_validation, ensemble
 
 
