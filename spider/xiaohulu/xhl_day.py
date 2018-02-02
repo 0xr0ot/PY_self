@@ -83,23 +83,21 @@ class Xhulu:
 
     def get_data(self):
         time.sleep(int(10 + random.random()*5))
-        queue = deque(['2018-01-30'],2)
-        now = arrow.utcnow().format('YYYY-MM-DD')
-        if queue[-1] != now:
-            queue.append(now)
+        yesterday = arrow.utcnow().shift(days=-1).format('YYYY-MM-DD')
+
         for plat in self.get_plat().items():
             # payload = {'plot': plat[1],'class': 'all','day': 'month','y': 1}
-            payload = {'plot': plat[1],'class': 'all','day': queue[0]}
+            payload = {'plot': plat[1],'class': 'all','day': yesterday}
             headers = {'User-Agent': random.choice(UA_POOL)}
             res = requests.get(self.target_url,params=payload,headers=headers)
             soup = BeautifulSoup(res.text,'lxml')
 
             for i,bang in enumerate(self.bang_pool):
-                gold = soup.find_all('div',{'class': 'w560 fl lmpank'})[0].find_all('div',{'class': 'svtable'})[i] #吸金榜 #吸金指数
+                gold = soup.find_all('div',{'class': 'w560 fl lmpank'})[0].find_all('div',{'class': 'svtable'})[i] #吸金榜 吸金指数
                 for item in gold.find_all('table'):
                     data = {
                         'plat': plat[0],
-                        'logDate': queue[0],
+                        'logDate': yesterday,
                         'bang': bang,
                         'rank': item.span.get_text(),
                         'img': item.img.attrs['src'],
