@@ -7,18 +7,18 @@ import requests
 
 
 class BDTJ:
-    def __init__(self):
+    def __init__(self,username,password,token):
         self.get_siteID_url = 'https://api.baidu.com/json/tongji/v1/ReportService/getSiteList'
         self.get_data_url = 'https://api.baidu.com/json/tongji/v1/ReportService/getData'
-        self.username = 'xxxx'
-        self.password = 'xxxx'
-        self.token = 'xxxxxxxxxx'
+        self.username = username
+        self.password = password
+        self.token = token
         self.form_data = {
             'header': {
                 'account_type': 1,
-                'username': self.username,
-                'password': self.password,
-                'token': self.token
+                'username': username,
+                'password': password,
+                'token': token
             }
         }
         self.siteIDs = self.get_siteID()
@@ -51,11 +51,15 @@ class BDTJ:
 
 
 if __name__ == '__main__':
+    username,password,token = ('xxxx','xxxx','xxxxxxxx') #TODO
+    bdtj = BDTJ(username,password,token)
+
     today = arrow.utcnow().shift().format('YYYYMMDD')
     yesterday = arrow.utcnow().shift(days=-1).format('YYYYMMDD')
     method = 'overview/getTimeTrendRpt'
     metrics = 'pv_count,visitor_count,ip_count,bounce_ratio,avg_visit_time'
-    bdtj = BDTJ()
+    
     for siteID in bdtj.siteIDs.values():
         data = bdtj.get_data(siteID,yesterday,today,method,metrics)
         print(data)
+
