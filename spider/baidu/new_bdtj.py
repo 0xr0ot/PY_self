@@ -54,12 +54,11 @@ if __name__ == '__main__':
     username,password,token = ('xxxx','xxxx','xxxxxxxx') #TODO
     bdtj = BDTJ(username,password,token)
 
-    today = arrow.utcnow().shift().format('YYYYMMDD')
-    yesterday = arrow.utcnow().shift(days=-1).format('YYYYMMDD')
+    today = arrow.utcnow().to('local').shift().format('YYYYMMDD')
+    yesterday = arrow.utcnow().to('local').shift(days=-1).format('YYYYMMDD')
     method = 'overview/getTimeTrendRpt'
     metrics = 'pv_count,visitor_count,ip_count,bounce_ratio,avg_visit_time'
     
     for siteID in bdtj.siteIDs.values():
         data = bdtj.get_data(siteID,yesterday,today,method,metrics)
         print(data)
-
