@@ -29,9 +29,9 @@
 2.networkx库
 
 应用：
-1.图的遍历算法（广度优先bfs[Breadth-first search]、深度优先dfs[Depth-first search]）
+1.图的遍历算法（广度优先bfs[Breadth-first search](少换乘，边数总和最低)、深度优先dfs[Depth-first search]）
 2.最小生成树算法（prim算法）
-3.最短路径算法（dijkstra算法）
+3.最短路径算法（dijkstra算法(路程最短，边权值总和最低)）
 4.拓扑排序算法（topsort算法）
 
 ```
@@ -81,7 +81,7 @@ G3 = [{b:1,e:2},{c:3,d:4,e:5},{b:6,d:7},{b:8,c:9,e:10},{a:11,b:12,d:13}]
 
 ```
 
-## *2.深度优先VS广度优先* ##
+## *2.深度优先VS广度优先(边数最少)* ##
 
 ```python
 # coding=utf-8
@@ -184,7 +184,7 @@ if __name__ == '__main__':
 
 ```
 
-## *4.最短路径算法* ##
+## *4.最短路径算法(边权值总和最低)* ##
 
 ```python
 # coding=utf-8
