@@ -22,7 +22,7 @@ def maxAverage2(nums, k):
     return r1
 
 
-def maxAverage(self, nums, k):
+def maxAverage(nums, k):
     # 求列表中大于等于k个长度的子列表的最大平均值。
     # O()
     def search(nums,k,mid):
