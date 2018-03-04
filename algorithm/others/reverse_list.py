@@ -9,4 +9,4 @@ def reverseList(L):
     return L
     
 # 2
-newList = reversed(L)
+newList = list(reversed(L))
