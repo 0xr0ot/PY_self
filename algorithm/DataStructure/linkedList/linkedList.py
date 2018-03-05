@@ -50,7 +50,7 @@ class LList:
             p.next = LNode(elem)
 
 
-    def pop(self):
+    def pop_first(self):
         if self.head is None:
             raise Exception('PopError, now head is None!')
         e = self.head.elem
@@ -135,7 +135,7 @@ class LList:
 
 if __name__ == '__main__':
     llist = LList()
-    # llist.pop()
+    # llist.pop_fisrt()
 
     print('-' * 30)
     for i in range(3):
