@@ -92,6 +92,46 @@ class LList:
             yield p.elem
             p = p.next
 
+ 
+    def sort1(self): # 插入排序（倒换大元素）
+        if self.head is None:
+            return
+        csr = self.head.next                    # csr: cursor
+        while csr is not None:
+            x = csr.elem
+            p = self.head
+            while p is not csr and p.elem <= x: # 跳过小元素
+                p = p.next
+            while p is not csr:                 # 倒换大元素，完成元素插入
+                y = p.elem
+                p.elem = x
+                x = y
+                p = p.next
+            csr.elem = x
+            csr = csr.next                      # 回填最后一个元素
+
+
+    def sort2(self): # 插入排序（调整链接）
+        p = self.head
+        if p is None or p.next is None:
+            return
+        csr = p.next
+        p.next = None
+        while csr is not None:
+            p = self.head
+            q = None
+            while p is not None and p.elem <= csr.elem:
+                q = p
+                p = p.next
+            if q is None:
+                self.head = csr
+            else:
+                q.next = csr
+            q = csr
+            csr = csr.next
+            q.next = p
+
+ 
 
 if __name__ == '__main__':
     llist = LList()
@@ -104,5 +144,10 @@ if __name__ == '__main__':
     llist.print_all()
 
     print('-'*30)
-    llist.insertL(1,100)
+    for _ in range(2):
+        llist.insertL(1,100)
+    llist.print_all()
+
+    print('-'*30)
+    llist.sort2()
     llist.print_all()
