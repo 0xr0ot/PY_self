@@ -1,5 +1,4 @@
 def state_dict(self, destination=None, prefix='', keep_vars=False):
-
 	"""Returns a dictionary containing a whole state of the module.
 
 	Both parameters and persistent buffers (e.g. running averages) are
