@@ -1,13 +1,13 @@
 # coding=utf-8
 
-
+import numpy as np
 import torch
 from torch.autograd import Variable
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
 
-# make data:
+# make data
 x = torch.linspace(-5,5,200)
 x = Variable(x)
 x_np = x.data.numpy()
@@ -19,7 +19,6 @@ y_softplus = F.softplus(x).data.numpy()
 y_softmax = F.softmax(x).data.numpy()
 
 
-# plt:
 fig = plt.figure()
 
 ax1 = fig.add_subplot(2,3,1)

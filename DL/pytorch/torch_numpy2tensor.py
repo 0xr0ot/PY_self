@@ -29,3 +29,5 @@ t.add(x1,x2,out=x2)
 # print(x2)
 
 print(t.cuda.is_available())
+
+
