@@ -4,15 +4,17 @@
 import requests
 
 def baiduMap(city):
-    key = 'GjG3XAdmywz7CyETWqHwIuEC6ZExY6QT'
+    key = 'GjG3XAdmywz7CyETWqHxylwIuEC6ZExY6QT'
     url = 'http://api.map.baidu.com/geocoder/v2/?output=json&ak={}&address='.format(key) + city
     data = requests.get(url).json()
     return data
 
 def googleMap(city):
-    url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + city
+    key = 'AIzaSyDdz0-XTlMqgvK6AxylaKOh45PcFJwoa08FKs'
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?address={0}&key={1}'.format(city,key)
     data = requests.get(url).json()
-    return data
+    r = data.get('results')[0].get('formatted_address')
+    return r
 
 
 for city in ('上海','上海市','纽约','New York','Bixessarri','NULL',''):
