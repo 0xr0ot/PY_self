@@ -16,6 +16,11 @@ def googleMap(city):
     r = data.get('results')[0].get('formatted_address')
     return r
 
+from mapq import Geo # edit unquote.
+def mapQuest(city):
+    key = 'IOonFXAQap2OXL5JWeyDtseOFhHZSV4jsYd'
+    g = Geo(key)
+    return g.latlng(city)
 
 for city in ('上海','上海市','纽约','New York','Bixessarri','NULL',''):
     # print(baiduMap(city))
