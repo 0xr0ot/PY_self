@@ -1,7 +1,7 @@
 # coding=utf-8
 
 data = {
-    'FlyLine': flyLine,
+    'FlyLine': ['beijing','shanghai','123'],
     'latlng': [30,-100]
 }
 
