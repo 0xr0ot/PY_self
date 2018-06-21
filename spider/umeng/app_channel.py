@@ -27,8 +27,8 @@ def get_tk(url):
 def login(host, login_url):
     form_data = {
         'token': get_tk(host)['token'],
-        'username': 'qqmobile@guagua.com',
-        'password': 'QJkj2016fhiier7102',
+        'username': 'xxxx',
+        'password': 'xxxx',
         'sig': '',
         'sessionid': '',  # get_tk(host)['sessionid']
         'website': 'umengplus',
