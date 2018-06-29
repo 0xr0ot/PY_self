@@ -25,3 +25,17 @@ print(trans_timestamp(time_stamp))#13位会报错
 
 print(get_timestamp())
 print(trans_timestamp(get_timestamp()))#10位正常，返回：2017-11-06 11:44:16
+
+
+#########################################################################
+from datetime import datetime,date,timedelta
+
+week_now = datetime.today().weekday()
+print(week_now)# return: [0,6]
+
+def getDate(n,isPt=True):
+    theday = date.today() + timedelta(days=n)
+    if isPt:
+        return theday.strftime('%Y%m%d')
+    return theday.strftime('%Y-%m-%d')
+
