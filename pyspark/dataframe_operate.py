@@ -24,7 +24,7 @@ df = spark.createDataFrame(df)
 
 #df['a'] is Column, df.select('a') is DataFrame.
 
-data = data.filter(df['b'] > 0)
+df = df.filter(df['b'] > 0)
 df = df.filter(df['b'].isNotNull())
 df = df.filter(df.b != np.nan)
 
