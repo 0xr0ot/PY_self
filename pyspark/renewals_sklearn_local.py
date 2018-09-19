@@ -20,7 +20,7 @@ except:
     spark = HiveContext(sc)
 
 
-path = '/home/xxx/xxx'
+path = '/home/xxx/xxx/'
 
 spark_df1 = spark.sql('select * from temp.xxx_feature').select('*')
 data = spark_df1.toPandas()
