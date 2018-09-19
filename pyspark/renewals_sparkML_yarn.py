@@ -18,7 +18,6 @@ import pyspark.ml.evaluation as ev
 from sklearn.metrics import confusion_matrix,classification_report,accuracy_score,roc_auc_score
 
 
-
 begin_time = time.time()
 
 conf = SparkConf().setMaster("yarn").setAppName("renew_app")
@@ -32,7 +31,6 @@ conf.set("spark.driver.memory",'16g')
 conf.set("spark.driver.maxResultSize","16g")
 conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
 conf.set("spark.sql.execution.arrow.enabled", "true")#toPandas best.
-
 
 sc = SparkContext(conf=conf,batchSize=0)
 spark = SparkSession(sc)
@@ -129,7 +127,6 @@ def clear_spark_data(data):
     data = data.drop('lastpaid2now_class2_hours')
     data = data.drop('point_36_date')
     return data
-
 
 ################## data_ready #############################
 try:
