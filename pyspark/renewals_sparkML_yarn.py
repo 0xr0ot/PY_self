@@ -15,6 +15,8 @@ import pyspark.ml.classification as cl
 from pyspark.ml import Pipeline
 import pyspark.ml.tuning as tune
 import pyspark.ml.evaluation as ev
+from sklearn.metrics import confusion_matrix,classification_report,accuracy_score,roc_auc_score
+
 
 
 begin_time = time.time()
@@ -29,6 +31,8 @@ conf.set("spark.driver.cores",8)
 conf.set("spark.driver.memory",'16g')
 conf.set("spark.driver.maxResultSize","16g")
 conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+conf.set("spark.sql.execution.arrow.enabled", "true")#toPandas best.
+
 
 sc = SparkContext(conf=conf,batchSize=0)
 spark = SparkSession(sc)
@@ -36,7 +40,8 @@ spark = SparkSession(sc)
 data = spark.sql('select * from bigdata_algorithm.xxx_renew_l6m').select('*')
 print(data.count())
 data.agg(fn.count('student_id').alias('stu_cnt'), fn.countDistinct('student_id').alias('stu_dis_cnt')).show()
-print(data.where('y==1').count())
+print('negative_sample:',data.where('y==0').count())
+print('positive_sample:',data.where('y==1').count())
 
 #######################################################
 def clear_spark_data(data):
@@ -86,9 +91,13 @@ def clear_spark_data(data):
     data = data.filter(data['all_paid_hours'].isNotNull())
     data = data.filter(data['all_paid_hours'] != np.nan)
 
-    data = data.withColumn('now_during', fn.when(fn.dayofmonth('point_36_date')<=10,1).when(fn.dayofmonth('point_36_date')<=20,2).otherwise(3))
+    data = data.withColumn('now_during', fn.when(fn.dayofmonth('point_36_date')<=10,1)\
+                           .when(fn.dayofmonth('point_36_date')<=20,2)\
+                           .otherwise(3))
     data = data.withColumn('will_renew_date', fn.date_add(data['point_36_date'],11))
-    data = data.withColumn('renew_during', fn.when(fn.dayofmonth('will_renew_date')<=10,1).when(fn.dayofmonth('will_renew_date')<=20,2).otherwise(3))#avg(datediff(point_renew_date,point_36_date))
+    data = data.withColumn('renew_during', fn.when(fn.dayofmonth('will_renew_date')<=10,1)\
+                           .when(fn.dayofmonth('will_renew_date')<=20,2)\
+                           .otherwise(3))#avg(datediff(point_renew_date,point_36_date))
     data = data.drop('will_renew_date')
 
     data = data.withColumn('register2new_distance', data['register_distance'] - data['last_new_distance'])
@@ -113,12 +122,14 @@ def clear_spark_data(data):
     data = data.withColumn('lpd2n_day_class_hours', (data['last_paid_hours'] + data['last_left_hours']) / data['last_paid_distance'])
     data = data.withColumn('will_zero_hours_distance', data['left_hours'] / ((data['lastpaid2now_class1_hours']+1) / data['last_paid_distance']))
     data = data.withColumn('gift_gr1_hours_percent_entry_distance', data['gift_gr1_hours'] / data['entry_distance'])
-    data = data.withColumn('student_type', fn.when(data['student_type']=='NORMAL',1).when(data['student_type']=='VIP',2)
-                           .when(data['student_type']=='KOL',3).otherwise(0))
+    data = data.withColumn('student_type', fn.when(data['student_type']=='NORMAL',1).when(data['student_type']=='VIP',2)\
+                           .when(data['student_type']=='KOL',3)\
+                           .otherwise(0))
 
     data = data.drop('lastpaid2now_class2_hours')
     data = data.drop('point_36_date')
     return data
+
 
 ################## data_ready #############################
 try:
@@ -126,7 +137,8 @@ try:
 
     print(data.count())
     data.agg(fn.count('student_id').alias('stu_cnt'), fn.countDistinct('student_id').alias('stu_dis_cnt')).show()
-    print(data.where('y==1').count())
+    print('negative_sample:', data.where('y==0').count())
+    print('positive_sample:', data.where('y==1').count())
 
     # stu_pool = data.select('student_id')
     data = data.drop('student_id')
@@ -134,7 +146,7 @@ try:
     ## miss_value:
     # miss_pool = data.agg(*[(1 - (fn.count(x)/fn.count('*'))) for x in data.columns])
     # miss_pool.show()
-    # miss_pool.toPandas().to_csv('/tmp/xxx/miss_{}.csv'.format(time.time()),index=False)
+    # miss_pool.toPandas().to_csv('/tmp/xieyulong/miss_{}.csv'.format(time.time()),index=False)
 
     ##static_variance:
     data_rdd = data.rdd.map(lambda row: [x for x in row])
@@ -151,16 +163,23 @@ try:
     ##featuerCreator:
     featuerCreator = ft.VectorAssembler(inputCols=fea_pool,outputCol='features')
 
-    train,test = data.randomSplit([0.7,0.3],seed=42)
+    ##weightCol:
+    data = data.withColumn('weight',fn.when(data['y']==1,1.0).otherwise(0.02))
+
+    train,test = data.randomSplit([0.7,0.3],seed=1234)#42
     lr_model = cl.LogisticRegression(
         # maxIter=10,
         # regParam=0.01,
+        elasticNetParam=0,
+        family='binomial',
+        threshold=0.5,
+        weightCol='weight',
         labelCol='y'
     )
 
     grid = tune.ParamGridBuilder()\
-        .addGrid(lr_model.maxIter,[2,10,50])\
-        .addGrid(lr_model.regParam,[0.01,0.05,0.3])\
+        .addGrid(lr_model.maxIter,[200,300,500,800])\
+        .addGrid(lr_model.regParam,[0.001,0.002])\
         .build()
 
     evaluator = ev.BinaryClassificationEvaluator(
@@ -194,7 +213,15 @@ try:
     ]
     print(sorted(best_param,key=lambda x: x[1],reverse=True)[0])
 
+    print('Begin to sklearn evaluate:')
+    y_pred = results.select('prediction').toPandas()['prediction']
+    y_prob = results.select('probability').toPandas()['probability']
+    y_true = results.select('y').toPandas()['y']
+    print(confusion_matrix(y_true,y_pred))
+    print(classification_report(y_true,y_pred))
 
+    # print(roc_auc_score(y_true,y_prob))
+    print(accuracy_score(y_true,y_pred))
 
 # lr_model = cl.GBTClassifier(
 #     maxDepth=5,
