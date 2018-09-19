@@ -134,7 +134,7 @@ try:
     ## miss_value:
     # miss_pool = data.agg(*[(1 - (fn.count(x)/fn.count('*'))) for x in data.columns])
     # miss_pool.show()
-    # miss_pool.toPandas().to_csv('/tmp/xieyulong/miss_{}.csv'.format(time.time()),index=False)
+    # miss_pool.toPandas().to_csv('/tmp/xxx/miss_{}.csv'.format(time.time()),index=False)
 
     ##static_variance:
     data_rdd = data.rdd.map(lambda row: [x for x in row])
