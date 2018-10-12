@@ -8,6 +8,11 @@ def get_timestamp():
     time_stamp = int(time.mktime(time_p))
     return time_stamp #返回10位
 
+def to_timestamp(tt,length=10):
+    return int(time.mktime(time.strptime(tt,'%Y-%m-%d %H:%M:%S')))*(10**(length-10))
+# to_timestamp('2018-10-10 19:40:32')
+# return: 1539171632
+
 ##method_2:
 time_stamp = int(1000 * time.time())#返回13位
 
