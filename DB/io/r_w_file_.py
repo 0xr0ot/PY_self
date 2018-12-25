@@ -17,7 +17,7 @@ def read_bigfile(path):
     with open(path, 'r', encoding='utf-8') as f:
         mark = True
         while mark:
-            content.append((f.readline())[:-1]) ##del '\n'
+            content.append(f.readline().strip()) ##del '\n'
             mark = content[-1]
     return content[:-1]##list
 
