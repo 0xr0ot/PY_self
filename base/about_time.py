@@ -23,13 +23,11 @@ def getWeek(date,isPt=False):
     date_format = '%Y%m%d' if isPt else '%Y-%m-%d'
     return datetime.strptime(date,date_format).weekday() #[0,6] 0: Monday.
 
-def getDate(n,isPt=True):
-    theday = date.today() + timedelta(days=n)
-    if isPt:
-        return theday.strftime('%Y%m%d')
-    return theday.strftime('%Y-%m-%d')
+def getDate(n,isPt=False):
+    the_day = date.today() + timedelta(days=n)
+    date_format = '%Y%m%d' if isPt else '%Y-%m-%d'
+    return the_day.strftime(date_format)
 
 def getTime(timestamp):
-    if len(str(timestamp)) == 13:
-        timestamp = int(timestamp/1000)
+    timestamp = int(timestamp/1000) if len(str(timestamp)) == 13 else timestamp
     return datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
